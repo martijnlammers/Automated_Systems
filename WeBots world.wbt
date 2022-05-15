@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.4425014394848175 0.005244124795512489 -0.8967524603863619 3.084348746219831
-  position 1.8579032210815394 -0.7124945947637448 3.0044681332852288
+  orientation -0.12627786228943433 -0.0005365524918404366 0.9919947649090866 3.302436771433494
+  position 2.969501951481428 1.3014692950884308 2.312273670370102
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -41,8 +41,9 @@ Wall {
   size 3.3 0.2 2.4
 }
 Door {
+  hidden translation_5 0.0010000002705244093 8.485923075340907e-11 0
   translation -2.25 -1.45 0
-  position -1.1325392232694617e-09
+  position -1.7020642654275983e-09
 }
 SolidBox {
   translation -2.146 0.455 0.03
@@ -97,10 +98,6 @@ CeilingLight {
   translation -0.93 -1.04 2.4
   pointLightColor 1 0.9764705882352941 0.9058823529411765
   pointLightIntensity 4
-}
-CardboardBox {
-  translation -1.4 -0.35 0.06
-  size 0.1 0.1 0.1
 }
 Floor {
   translation 0.8 -0.8 0.01
@@ -228,4 +225,14 @@ Floor {
     type "chequered"
     colorOverride 0 0 0
   }
+}
+BoeBot {
+  hidden position_0_0 15.584505541495231
+  hidden position_0_1 15.461132811810499
+  hidden rotation_9 0 1 0 4.761404927136058
+  hidden rotation_10 0 1 0 3.294762197451326
+  translation 0.517755 -0.0107355 0.0486465
+  rotation -0.010504098139014916 0.0001232609781621574 0.9999448228422492 3.11762
+  controller "controller"
+  supervisor TRUE
 }
