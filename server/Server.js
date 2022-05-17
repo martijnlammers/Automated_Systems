@@ -74,4 +74,23 @@ client.on('connect', () => {
   });
 });
 
+/*
+ *  MSG format:
+ *  data transfer between robot and server: robots/<robotID>/<robotProperty>
+ *  registering robots at the server:       robots/register/<random number>
+ */
+
+client.on("message", (topic, message) => {
+  let splitTopics = topic.split('/');
+
+  if(!(splitTopics[0] === "robots" && splitTopics.length > 1)){
+    return;
+  }
+
+  if(robots.some(robot => splitTopics[1] === robot.robotID)){
+    console.log(`topic is: ${splitTopics[1]}, robots: ${JSON.stringify(robots)}`);
+
+    inputHandler(topic, message);
+
+  }
 });
