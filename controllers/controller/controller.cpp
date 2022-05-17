@@ -17,13 +17,11 @@
 using namespace webots;
 using namespace std;
 
-
-enum string_code{
-  eForward,
-  eBackward,
-  eStop,
-  eRotate,
-  eInvalid
+Robot *robot = new Robot();
+Motor *leftMotor = robot->getMotor("left wheel motor");
+Motor *rightMotor = robot->getMotor("right wheel motor");
+enum string_code{eForward,
+  eBackward, eRotate, eInvalid
 };
 
 // In a function as its used in an overload.
@@ -35,8 +33,6 @@ string_code encodeDirection(string direction){
 }
 
 void changeDirection(Robot *robot, string direction){
-  Motor *leftMotor = robot->getMotor("left wheel motor");
-  Motor *rightMotor = robot->getMotor("right wheel motor");
   leftMotor->setPosition(INFINITY);
   rightMotor->setPosition(INFINITY);
   switch(encodeDirection(direction)){
@@ -51,20 +47,17 @@ void changeDirection(Robot *robot, string direction){
      rightMotor->setVelocity(-(0.1 * MAX_SPEED));
     cout << "BACKWARD"<< endl;
     break;
-  case eStop:
-     leftMotor->setVelocity(0);
-     rightMotor->setVelocity(0);
+     
   default:
-    //cout << "Invalid movement. Only 'FORWARD', 'BACKWARD' or 'ROTATE'" << end;
-    cout << "Invalid use of function." << endl;
+    leftMotor->setVelocity(0);
+    rightMotor->setVelocity(0);
     break;
   }
   
 }
 
 void changeDirection(Robot *robot, string direction, int degrees){
-  Motor *leftMotor = robot->getMotor("left wheel motor");
-  Motor *rightMotor = robot->getMotor("right wheel motor");
+  
   leftMotor->setPosition(INFINITY);
   rightMotor->setPosition(INFINITY);
   switch(encodeDirection(direction)){
@@ -81,7 +74,8 @@ void changeDirection(Robot *robot, string direction, int degrees){
     
     break;
   default:
-    cout << "Invalid use of function." << endl;
+    leftMotor->setVelocity(0);
+    rightMotor->setVelocity(0);
     break;
   }
 }
@@ -89,15 +83,11 @@ void changeDirection(Robot *robot, string direction, int degrees){
 
 // entry point of the controller
 int main(int argc, char **argv) {
-  // create the Robot instance.
-  
-  // leftMotor->setPosition(INFINITY);
-  // rightMotor->setPosition(INFINITY);
-  // leftMotor->setVelocity(0.0);
-  // rightMotor->setVelocity(0.0);
-   Robot *robot = new Robot();
    //while (robot->step(TIME_STEP) != -1);
-   changeDirection(robot, "ROTATE", 90);
+  
+  
+  
+   //changeDirection(robot, "ROTATE", 90);
   
    //changeDirection(robot, "BACKWARD");
   
