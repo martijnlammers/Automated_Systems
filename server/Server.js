@@ -30,4 +30,13 @@ class Robot {
    }
 }
 
+// Function definitions
+
+function addRobot(robotID){
+  robots.push(new Robot(robotID));
+}
+
+function removeRobot(robotID){
+  robots = robots.filter(robot => robot.robotID !== robotID);
+}
 });
