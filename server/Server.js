@@ -17,4 +17,17 @@ const client = mqtt.connect(connectUrl, {
   password: 'backend',
   reconnectPeriod: 1000,
 });
+
+
+// Classes
+class Robot {
+   constructor(robotID){
+     this.robotID = robotID;
+     this.pos = [];
+     this.newPos = [];
+     this.heading = [];
+     this.obstacle = false;
+   }
+}
+
 });
