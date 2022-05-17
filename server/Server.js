@@ -18,6 +18,8 @@ const client = mqtt.connect(connectUrl, {
   reconnectPeriod: 1000,
 });
 
+const topicRobot = 'robots/#';
+
 
 // Classes
 class Robot {
@@ -63,5 +65,13 @@ function sendNewPos(robotID, newPos){
   client.publish(newPosTopic, newPos, {qos: 0, retain: true});
   console.log(`published ${newPos} to robot with ID: ${robotID}`);
 }
+
+//Subscribe to all robot topics
+client.on('connect', () => {
+  console.log('Connected');
+  client.subscribe([topicRobot], () => {
+    console.log(`Subscribe to topic '${topicRobot}'`);
+  });
+});
 
 });
