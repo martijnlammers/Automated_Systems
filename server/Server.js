@@ -39,4 +39,29 @@ function addRobot(robotID){
 function removeRobot(robotID){
   robots = robots.filter(robot => robot.robotID !== robotID);
 }
+
+function inputHandler(topic, message){
+  return;
+}
+
+function getCurrentPos(robotID){
+  return;
+}
+
+function calculatePos(robotID){
+  return;
+}
+
+function sendNewPosToAll(){
+  robots.forEach(robot => {
+    sendNewPos(robot.robotID)
+  });
+}
+
+function sendNewPos(robotID, newPos){
+  let newPosTopic = `robots/${robotID}/newPos`;
+  client.publish(newPosTopic, newPos, {qos: 0, retain: true});
+  console.log(`published ${newPos} to robot with ID: ${robotID}`);
+}
+
 });
