@@ -93,4 +93,13 @@ client.on("message", (topic, message) => {
     inputHandler(topic, message);
 
   }
+  //TODO: change logic for adding robots by letting the robot send a message to robots/subscribe/<randomly generated number>
+  //Add new robot object to the array if the topic is valid
+  
+  else {
+    splitTopics = topic.split('/');
+    if(splitTopics.length > 1){
+      addRobot(splitTopics[1]);
+    }
+  }
 });
