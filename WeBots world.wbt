@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation -0.20756493807471602 -0.07086192203738552 0.9756512617155818 3.8785885587630844
-  position 0.7743350552089548 0.7183973309192968 0.5188559820410292
+  orientation -0.5324911160091959 -0.2003901821035359 0.8223727781777512 3.778058996992118
+  position 0.5064392751828569 0.44389496557190294 1.6489403645557923
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -22,8 +22,26 @@ Floor {
   appearance Parquetry {
   }
 }
-BoeBot {
+DEF red BoeBot {
   translation 0 0 0.04
+  rotation 0 0 1 -2.094395307179586
+  name "MY_ROBOT"
+  controller "supervisor_controller"
+  supervisor TRUE
+}
+DEF green BoeBot {
+  translation -0.89 0.12 0.04
+  rotation 0 0 1 -0.523595307179586
+  name "MY_ROBOT1"
+  controller "supervisor_controller"
+  supervisor TRUE
+}
+DEF blue BoeBot {
+  translation -0.79 -1.54 0.05
+  rotation 0 0 1 -1.8325953071795862
+  name "MY_ROBOT1(2)"
+  controller "supervisor_controller"
+  supervisor TRUE
 }
 Wall {
   translation -2.25 1.35 0
@@ -44,7 +62,6 @@ Wall {
   size 3.3 0.2 2.4
 }
 Door {
-  hidden translation_5 0.0010000010790049696 3.384668101347188e-10 0
   translation -2.25 -1.45 0
   position -3.4041286260328403e-09
 }
