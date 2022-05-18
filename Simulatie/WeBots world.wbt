@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.18578546278565286 0.03648549278241765 -0.9819127102924908 2.656201826490802
-  position 0.5689000514770047 0.33316105333137036 0.3188207781458753
+  orientation -0.3016978160978528 -0.11574054392799363 0.9463522358260894 3.902420357848462
+  position 0.47180023723564185 0.4920990432386723 0.6491434771500574
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -200,6 +200,33 @@ Robot {
   translation -7.12271407986832e-06 -0.00948601443606808 0.0399828719836941
   rotation 0.9999997181027329 -0.0007508624724350201 4.996931223786084e-08 0
   children [
+    Solid {
+      translation 0 0 0.003
+      children [
+        Shape {
+          appearance PBRAppearance {
+          }
+          geometry Box {
+            size 0.08 0.15 0.003125
+          }
+        }
+      ]
+      name "solid(2)"
+    }
+    Solid {
+      translation 0 0 0.006
+      children [
+        Shape {
+          appearance PBRAppearance {
+            baseColor 0.666667 0 1
+          }
+          geometry Box {
+            size 0.08 0.15 0.003125
+          }
+        }
+      ]
+      name "solid(3)"
+    }
     BallJoint {
       jointParameters BallJointParameters {
         anchor 0 0.06 -0.02
@@ -251,40 +278,9 @@ Robot {
           name "wheel_right"
         }
       ]
-      endPoint DEF wheel_right Solid {
-        translation 0.0429676 -0.03998420000000001 -1.4646688534708032e-05
-        rotation 0.5775878543135543 0.5773364105743151 -0.577126450246937 4.189461501707717
-        children [
-          DEF wheel_left Shape {
-            appearance PBRAppearance {
-              baseColor 0.145098 0.145098 0.145098
-              metalness 0
-            }
-            geometry Cylinder {
-              height 0.005
-              radius 0.03
-            }
-          }
-        ]
-        name "wheel_right"
-        boundingObject USE wheel_left
-        physics DEF Physics_wh Physics {
-        }
-      }
-    }
-    HingeJoint {
-      jointParameters HingeJointParameters {
-        position -1.0138174497623795e-08
-        anchor 0 -0.04 0
-      }
-      device [
-        DEF wheel_left RotationalMotor {
-          name "wheel_left"
-        }
-      ]
       endPoint DEF wheel_left Solid {
-        translation -0.0420316 -0.0399202 -1.4563911053959842e-05
-        rotation 0.5775883690106912 0.5773353897207754 -0.5771269563618823 4.189459961629019
+        translation 0.0429676 -0.03998420000000001 -1.464668853470805e-05
+        rotation 0.5775878543135543 0.5773364105743151 -0.577126450246937 4.189461501707717
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -303,10 +299,40 @@ Robot {
         }
       }
     }
+    HingeJoint {
+      jointParameters HingeJointParameters {
+        position -1.0138174497623795e-08
+        anchor 0 -0.04 0
+      }
+      device [
+        DEF wheel_left RotationalMotor {
+          name "wheel_left"
+        }
+      ]
+      endPoint DEF wheel_right Solid {
+        translation -0.0420316 -0.0399202 -1.456391105395986e-05
+        rotation 0.5775883690106912 0.5773353897207754 -0.5771269563618823 4.189459961629019
+        children [
+          DEF wheel_right Shape {
+            appearance PBRAppearance {
+              baseColor 0.145098 0.145098 0.145098
+              metalness 0
+            }
+            geometry Cylinder {
+              height 0.005
+              radius 0.03
+            }
+          }
+        ]
+        name "wheel_right"
+        boundingObject USE wheel_right
+        physics DEF Physics_wh Physics {
+        }
+      }
+    }
     DEF Body1 Shape {
       appearance PBRAppearance {
-        baseColor 0.435294 0 0.65098
-        metalness 0
+        baseColor 1 0.666667 1
       }
       geometry Box {
         size 0.08 0.15 0.003125
@@ -343,11 +369,6 @@ CardboardBox {
   translation -0.62 -0.54 0.07
   rotation 1 0 0 4.692820414042842e-06
   size 0.1 0.1 0.1
-}
-BoeBot {
-  translation -0.01081721112951545 0.23999985262261306 0.04864601575476568
-  rotation 0.0001819279643919735 -0.9999999834505429 1.0628932729072339e-06 0.021007201885587606
-  controller ""
 }
 Floor {
   translation -0.6 -1.05 0

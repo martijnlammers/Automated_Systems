@@ -18,8 +18,8 @@ using namespace webots;
 using namespace std;
 
 Robot *robot = new Robot();
-Motor *leftMotor = robot->getMotor("left wheel motor");
-Motor *rightMotor = robot->getMotor("right wheel motor");
+Motor *leftMotor = robot->getMotor("wheel_left");
+Motor *rightMotor = robot->getMotor("wheel_right");
 enum string_code{eForward,
   eBackward, eRotate, eInvalid
 };
@@ -83,14 +83,7 @@ void changeDirection(Robot *robot, string direction, int degrees){
 
 // entry point of the controller
 int main(int argc, char **argv) {
-   //while (robot->step(TIME_STEP) != -1);
-  
-  
-  
-   //changeDirection(robot, "ROTATE", 90);
-  
-   //changeDirection(robot, "BACKWARD");
-  
+   changeDirection(robot, "ROTATE", 90);
    delete robot;
    return 0; //EXIT_SUCCESS
 }
