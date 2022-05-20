@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation -0.3016978160978528 -0.11574054392799363 0.9463522358260894 3.902420357848462
-  position 0.47180023723564185 0.4920990432386723 0.6491434771500574
+  orientation -0.4308922976853037 0.09548160612979195 0.8973377795938132 2.793329071329657
+  position 0.34679239014657814 -0.1537242869111216 0.4874268208959393
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -200,6 +200,57 @@ Robot {
   translation -7.12271407986832e-06 -0.00948601443606808 0.0399828719836941
   rotation 0.9999997181027329 -0.0007508624724350201 4.996931223786084e-08 0
   children [
+    Compass {
+      children [
+        Solid {
+          translation 0 -0.026 0.01
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Cylinder {
+                height 0.004
+                radius 0.015
+              }
+            }
+          ]
+        }
+      ]
+    }
+    Accelerometer {
+      children [
+        Solid {
+          translation 0 -0.06 0.008
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Box {
+                size 0.02 0.02 0.0025
+              }
+            }
+          ]
+        }
+      ]
+    }
+    GPS {
+      children [
+        Solid {
+          translation 0 0 0.01
+          children [
+            Shape {
+              appearance PBRAppearance {
+              }
+              geometry Cylinder {
+                height 0.01
+                radius 0.0025
+              }
+            }
+          ]
+        }
+      ]
+      name "global"
+    }
     Solid {
       translation 0 0 0.003
       children [
@@ -274,12 +325,12 @@ Robot {
         anchor 0 -0.04 0
       }
       device [
-        DEF wheel_right RotationalMotor {
-          name "wheel_right"
+        DEF wheel_left RotationalMotor {
+          name "wheel_left"
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.0429676 -0.03998420000000001 -1.464668853470805e-05
+        translation 0.0429676 -0.03998420000000001 -1.4646688534708073e-05
         rotation 0.5775878543135543 0.5773364105743151 -0.577126450246937 4.189461501707717
         children [
           DEF wheel_left Shape {
@@ -305,12 +356,12 @@ Robot {
         anchor 0 -0.04 0
       }
       device [
-        DEF wheel_left RotationalMotor {
-          name "wheel_left"
+        DEF wheel_right RotationalMotor {
+          name "wheel_right"
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.0420316 -0.0399202 -1.456391105395986e-05
+        translation -0.0420316 -0.0399202 -1.4563911053959883e-05
         rotation 0.5775883690106912 0.5773353897207754 -0.5771269563618823 4.189459961629019
         children [
           DEF wheel_right Shape {
