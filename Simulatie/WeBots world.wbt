@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation -0.389000847853916 0.01007675657310235 0.9211822834520327 3.1431373673200826
-  position 0.5539131199536866 -0.1119315520540789 0.5526355378704267
+  orientation -0.513829433417138 -0.06758934574169573 0.8552256975187498 3.4030317056028867
+  position 0.2894157638008245 0.019580628480976067 0.5340340410418533
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -203,7 +203,7 @@ Robot {
     Compass {
       children [
         Solid {
-          translation 0 -0.026 0.01
+          translation 0 -0.016 0.01
           children [
             Shape {
               appearance PBRAppearance {
@@ -220,7 +220,7 @@ Robot {
     Accelerometer {
       children [
         Solid {
-          translation 0 -0.06 0.008
+          translation 0 -0.05 0.008
           children [
             Shape {
               appearance PBRAppearance {
@@ -330,8 +330,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.0429676 -0.03998420000000001 -1.4646688534709333e-05
-        rotation 0.5775878543135543 0.5773364105743152 -0.577126450246937 4.189461501707717
+        translation 0.042967600000000016 -0.03998420000000001 -1.4646688534709908e-05
+        rotation 0.5775878543135543 0.5773364105743151 -0.577126450246937 4.189461501707717
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -361,8 +361,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.042031599999999975 -0.0399202 -1.4563911053961064e-05
-        rotation 0.5775883690106912 0.5773353897207754 -0.5771269563618823 4.189459961629019
+        translation -0.04203159999999999 -0.0399202 -1.4563911053960583e-05
+        rotation 0.5775883690106913 0.5773353897207752 -0.5771269563618822 4.189459961629024
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {

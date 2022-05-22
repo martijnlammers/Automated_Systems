@@ -45,12 +45,18 @@ using namespace std;
 Robot *r = new Robot();
 Motor *motors[2] = {r->getMotor("wheel_left"), r->getMotor("wheel_right")};
 GPS *gps = r->getGPS("global");
-Compass *compass = r->getCompass("compass");
+
+// Middle compass
+Compass *m_compass = r->getCompass("compass");
+// Front compass used to determine a second vector to calculate angle for 
+Accelerometer *accelerometer = r->getAccelerometer("accelerometer");
+
 
 //Set up of sensors and actuators used by the robot.
 void initializeRobot(){
   gps->enable(TIME_STEP);
   compass->enable(TIME_STEP);
+  accelerometer->enable(TIME_STEP);
   motors[LEFT]->setPosition(INFINITY);
   motors[RIGHT]->setPosition(INFINITY);
   motors[LEFT]->setVelocity(0);
@@ -122,9 +128,9 @@ void rotateHeading(const double thetaDot){
 		printf("duration to face the destination: %.5f\n", duration);
 
 		if (thetaDot > 0){
-                    	   motorRotateRight();
+                    	   motorRotateLeft();
 		} else if (thetaDot < 0){
-		   motorRotateLeft();
+		   motorRotateRight();
 		}
 		double start_time = r->getTime();
 		do
@@ -160,27 +166,38 @@ void moveForward(double distance)
 void moveRobot(double *destination){
      r->step(1);
      const double * robotPosition = gps->getValues();
+     const double *compassValues = compass->getValues();
      // Code inspiration: https://github.com/albertbrucelee/webots-e-puck_robot-tutorial/blob/master/3%20-%20Move%20To%20Destination%20Location/source%20code/controllers/e-puck-move_to_destination_location/e-puck-move_to_destination_location.c
      
-     printf("Initial Coordinate: %.5f %.5f\n", robotPosition[0], robotPosition[1]);
-     printf("Destination Coordinate: %.5f %.5f\n", destination[0], destination[1]);
+     // printf("Initial Coordinate: %.5f %.5f\n", robotPosition[0], robotPosition[1]);
+     // printf("Destination Coordinate: %.5f %.5f\n", destination[0], destination[1]);
      
      // Quits function when the destination equals the current position.
      if (fabs(robotPosition[0] - destination[0]) < POS_MATCHING_ACC &&
       fabs(robotPosition[1] - destination[1]) < POS_MATCHING_ACC) return;
   
-     // Get the angle to destination and rotate.	
-     double robotHeading = cartesianConvertCompassBearingToHeading(getRobotBearing());
-     double destinationTheta = atan2(destination[1] - robotPosition[1], destination[0] - robotPosition[0]) * 180 / M_PI;
-     double thetaDotToDestination = cartesianCalcThetaDot(robotHeading, destinationTheta);
-     printf("thetaDotToDestination: %.5f\n", thetaDotToDestination);
-     rotateHeading(thetaDotToDestination);
+     //Get the angle to destination and rotate.	
+     // double robotHeading = cartesianConvertCompassBearingToHeading(getRobotBearing());
+     // double destinationTheta = atan2(destination[1] - robotPosition[1], destination[0] - robotPosition[0]) * (180 / M_PI);
+     
+     // double thetaDotToDestination = cartesianCalcThetaDot(robotHeading, destinationTheta);
+     // printf("thetaDotToDestination: %.5f\n", destinationTheta);
+     // rotateHeading(thetaDotToDestination);
 
-     // the distance needed for the robot to reach its destination
-     double distanceToDestination = sqrt(pow(destination[0]-robotPosition[0], 2) + pow(destination[1]-robotPosition[1], 2));
-     printf("distanceToDestination: %.5f\n", distanceToDestination);
-     moveForward(distanceToDestination);
-     printf("Stop Coordinate: %.5f %.5f\n", robotPosition[0], robotPosition[1]);
+     // //the distance needed for the robot to reach its destination
+     // double distanceToDestination = sqrt(pow(destination[0]-robotPosition[0], 2) + pow(destination[1]-robotPosition[1], 2));
+     // printf("distanceToDestination: %.5f\n", distanceToDestination);
+     // moveForward(distanceToDestination);
+     // printf("Stop Coordinate: %.5f %.5f\n", robotPosition[0], robotPosition[1]);
+     const double *accelerometerData = accelerometer->getValues();
+     
+     // Element order: x-axis, y-axis, z-axis
+     cout << (compassValues[2] * 100) << endl;
+     
+     
+     // omg im a genius
+     // make second vector with a second gps built in the front!!! :OOO
+     
      
 }
 
