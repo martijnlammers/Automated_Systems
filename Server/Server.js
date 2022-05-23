@@ -2,6 +2,7 @@ const mqtt = require("mqtt");
 
 
 var robots = [];
+var robotCounter = 0;
 
 //mqtt connection setup
 const host = "127.0.0.1";
@@ -12,13 +13,13 @@ const connectUrl = `mqtt://${host}:${port}`;
 const client = mqtt.connect(connectUrl, {
   clientId,
   clean: true,
-  connectTimeout: 2000,
+  connectTimeout: 4000,
   username: 'backend',
   password: 'backend',
   reconnectPeriod: 1000,
 });
 
-const topicRobot = 'robots/#';
+const topicRobot = 'robots/toServer/#';
 
 
 // Classes
@@ -33,16 +34,27 @@ class Robot {
 }
 
 // Function definitions
+function registerRobot(topicArray){
+  newRobot = addRobot(`robot${robotCounter++}`);
+  topicArray[1] = "toRobot";
+  client.publish(topicArray.join("/"), newRobot.robotID);
+  console.log(`Published id: ${newRobot.robotID}`);
+}
 
 function addRobot(robotID){
-  robots.push(new Robot(robotID));
+  newRobot = new Robot(robotID);
+  robots.push(newRobot);
+  return newRobot;
 }
 
 function removeRobot(robotID){
   robots = robots.filter(robot => robot.robotID !== robotID);
 }
 
-function inputHandler(topic, message){
+function inputHandler(topicArray, message){
+
+  //Call correct function depending on the 3rd array element
+
   return;
 }
 
@@ -75,31 +87,27 @@ client.on('connect', () => {
 });
 
 /*
- *  MSG format:
- *  data transfer between robot and server: robots/<robotID>/<robotProperty>
- *  registering robots at the server:       robots/register/<random number>
+ * MSG format:
+ * data transfer robot to server: robots/toServer/<robotID>/<robotProperty>
+ * data transfer server to robot: robots/toRobot/<robotID>/<robotProperty>
+ * Registering robot:             robots/toServer/subscribe/<randomNumber>
  */
 
 client.on("message", (topic, message) => {
-  let splitTopics = topic.split('/');
+  let splitTopic = topic.split('/');
 
-  if(!(splitTopics[0] === "robots" && splitTopics.length > 1)){
+  if(!(splitTopic[0] === "robots" && splitTopic[1] === "toServer" && splitTopic.length > 2)){
     return;
   }
 
-  if(robots.some(robot => splitTopics[1] === robot.robotID)){
-    console.log(`topic is: ${splitTopics[1]}, robots: ${JSON.stringify(robots)}`);
+  if(robots.some(robot => robot.robotID === splitTopic[2])){
+    console.log(`topic is: ${splitTopic[1]}, robots: ${JSON.stringify(robots)}`);
 
-    inputHandler(topic, message);
-
+    inputHandler(splitTopic, message);
   }
-  //TODO: change logic for adding robots by letting the robot send a message to robots/subscribe/<randomly generated number>
-  //Add new robot object to the array if the topic is valid
-  
-  else {
-    splitTopics = topic.split('/');
-    if(splitTopics.length > 1){
-      addRobot(splitTopics[1]);
-    }
+
+  else if(splitTopic[2] === "register" && splitTopic.length > 2){
+    console.log("Registering a new robot...")
+    registerRobot(splitTopic);
   }
 });
