@@ -68,14 +68,14 @@ function calculatePos(robotID){
 
 function sendNewPosToAll(){
   robots.forEach(robot => {
-    sendNewPos(robot.robotID)
+    sendNewPos(robot)
   });
 }
 
-function sendNewPos(robotID, newPos){
-  let newPosTopic = `robots/${robotID}/newPos`;
-  client.publish(newPosTopic, newPos, {qos: 0, retain: true});
-  console.log(`published ${newPos} to robot with ID: ${robotID}`);
+function sendNewPos(robot){
+  let newPosTopic = `robots/toRobot/${robot.robotID}/newPos`;
+  client.publish(newPosTopic, robot.newPos, {qos: 0, retain: false});
+  console.log(`published ${robot.newPos} to robot with ID: ${robot.robotID}`);
 }
 
 //Subscribe to all robot topics
