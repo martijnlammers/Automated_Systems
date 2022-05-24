@@ -22,15 +22,15 @@ const client = mqtt.connect(connectUrl, {
 const topicRobot = 'robots/toServer/#';
 
 
-// Classes
 class Robot {
-   constructor(robotID){
-     this.robotID = robotID;
-     this.pos = [];
-     this.newPos = [];
-     this.heading = [];
-     this.obstacle = false;
-   }
+  constructor(robotID){
+    this.robotID = robotID;
+    this.position = [];
+    this.newPosition = [];
+    this.heading = 0;
+    this.obstacleDetected = [0, 0];
+    this.targetDetected = false;
+  }
 }
 
 // Function definitions
