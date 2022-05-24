@@ -3,6 +3,7 @@
 #include <webots/Robot.hpp>
 #include <webots/Motor.hpp>
 #include <webots/GPS.hpp>
+#include <webots/LightSensor.hpp>
 #include <iostream>
 #include <math.h>
 #include <vector>
@@ -22,11 +23,15 @@
 using namespace webots;
 using namespace std;
 
+
 Robot *r = new Robot();
 Motor *motors[2] = {r->getMotor("wheel_left"), r->getMotor("wheel_right")};
 GPS *m_gps = r->getGPS("middleGPS");
 GPS *f_gps = r->getGPS("frontGPS");
-vector<double> destinationCoordinates;
+LightSensor *lightsensor = r->getLightSensor()
+bool found_target = false;
+vector<double> destinationCoordinates{-1.178e-05, -0.00948605};
+//vector<double> destinationCoordinates{-0.4, -0.13};
 
 // Basic movement for the robot.
 void motorStop(){
@@ -57,32 +62,12 @@ void motorRotateRight(double speed_multiplier){
 void initializeRobot(){
   m_gps->enable(TIME_STEP);
   f_gps->enable(TIME_STEP);
+  lightsensor->enable(TIME_STEP);
   motors[LEFT]->setPosition(INFINITY);
   motors[RIGHT]->setPosition(INFINITY);
   motorStop();
   string name = r->getName();
-
-  //Test scenario with 3 bots.
-  if(name == "robot(1)"){
-    destinationCoordinates.push_back(-0.4);
-    destinationCoordinates.push_back(-0.13);
-  } else if(name == "robot"){
-    destinationCoordinates.push_back(0.15);
-    destinationCoordinates.push_back(-0.6);
-  } else if(name == "robot(2)"){
-    destinationCoordinates.push_back(-0.4);
-    destinationCoordinates.push_back(-1.07);
-  } else if(name == "robot(3)"){
-    destinationCoordinates.push_back(-0.4);
-    destinationCoordinates.push_back(-0.6);
-  }
 }
-
-
-
-
-
-
 
 /* Math source: https://www.cuemath.com/geometry/angle-between-vectors/
  * Calculates the rotation to the target.
@@ -127,6 +112,11 @@ void rotateToTarget(vector<double> &destination){
       motorRotateLeft(newAngle);
     }
     motorStop();
+    
+    /* Rotate wheels until the angle is close 
+     * to 0 deg.
+     */
+     
     if(initialAngle > newAngle){
       while(newAngle > ANGLE_ACCURACY){
         motorRotateLeft(newAngle);
@@ -145,7 +135,6 @@ void rotateToTarget(vector<double> &destination){
 
 void moveToTarget(vector<double> &destination){
   double a,b,length;
-  
   do {
     vector<vector<double>> vectors = getVectors(destination); 
     a = vectors[0][0];
@@ -159,11 +148,12 @@ void moveToTarget(vector<double> &destination){
 
 void moveRobot(vector<double> &destination){
      r->step(1);
+     const double *m_robotPos = m_gps->getValues();
      vector<vector<double>> vectors = getVectors(destination);
      // Quits function when the destination equals the current position.
-     // if (fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC &&
-      // fabs(m_robotPos[1] - destination[1]) < POS_MATCHING_ACC) return;
-     //cout << calculateAngleToTarget(getVectors(destination)) << endl;
+     if (fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC &&
+      fabs(m_robotPos[1] - destination[1]) < POS_MATCHING_ACC) return;
+      
      rotateToTarget(destination); 
      moveToTarget(destination); 
 }
@@ -172,25 +162,12 @@ int main(int argc, char **argv) {
    r->step(1);
    initializeRobot();
    moveRobot(destinationCoordinates);
-   
-   // Just for fun.
-   string name = r->getName();
-   if(name == "robot(1)"){
-    destinationCoordinates[0] = -0.58;
-    destinationCoordinates[1] = -0.13;
-  } else if(name == "robot"){
-    destinationCoordinates[0] = 0.19;
-    destinationCoordinates[1] = -0.13;
-  } else if(name == "robot(2)"){
-    destinationCoordinates[0] = 0.19;
-    destinationCoordinates[1] = -1.07;
-  } else if(name == "robot(3)"){
-    destinationCoordinates[0] = -0.58;
-    destinationCoordinates[1] = -1.07;
-  }
-  moveRobot(destinationCoordinates);
-  
-  
    delete r;
    return 0;
+   /* TO-DO
+   * Create event handler for sensors
+   * Connect to server using MQTT
+   * Add LDR + IR(?) sensors
+   */
+   
 }
