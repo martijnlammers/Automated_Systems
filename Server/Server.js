@@ -51,11 +51,31 @@ function removeRobot(robotID){
   robots = robots.filter(robot => robot.robotID !== robotID);
 }
 
-function inputHandler(topicArray, message){
+function inputHandler(robot, topicArray, message){
+  if(Object.getOwnPropertyNames(robot).some(property => property == topicArray[3])){
+    switch(typeof(robot[topicArray[3]])){
+      case "number":
+        robot[topicArray[3]] = parseInt(message);
+        break;
+      case "object":
+        if(Array.isArray(robot[topicArray[3]])){
+          
+          //Convert numbers in a string (ex: "1,2,3") to int array
+          robot[topicArray[3]] = message.split(",").map(Number);
+        }
 
-  //Call correct function depending on the 3rd array element
+        break;
 
-  return;
+      case "boolean":
+        robot[topicArray[3]] = (message.toLowerCase() === "true");
+        break;
+    }
+  }
+
+  else{
+    //Send error code to robot
+    console.log("Error: invalid topic!");
+  }
 }
 
 function getCurrentPos(robotID){
@@ -86,24 +106,20 @@ client.on('connect', () => {
   });
 });
 
-/*
- * MSG format:
- * data transfer robot to server: robots/toServer/<robotID>/<robotProperty>
- * data transfer server to robot: robots/toRobot/<robotID>/<robotProperty>
- * Registering robot:             robots/toServer/subscribe/<randomNumber>
- */
-
 client.on("message", (topic, message) => {
   let splitTopic = topic.split('/');
+  message = message.toString();
 
   if(!(splitTopic[0] === "robots" && splitTopic[1] === "toServer" && splitTopic.length > 2)){
     return;
   }
+  
+  if(robots.some(r => r.robotID === splitTopic[2])){
+    let robot = robots.filter(r => r.robotID === splitTopic[2]).pop();
 
-  if(robots.some(robot => robot.robotID === splitTopic[2])){
-    console.log(`topic is: ${splitTopic[1]}, robots: ${JSON.stringify(robots)}`);
-
-    inputHandler(splitTopic, message);
+    if(robot != undefined){
+      inputHandler(robot, splitTopic, message);
+    }
   }
 
   else if(splitTopic[2] === "register" && splitTopic.length > 2){
