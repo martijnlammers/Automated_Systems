@@ -101,7 +101,14 @@ function sendNewPos(robot){
 //Subscribe to all robot topics
 client.on('connect', () => {
   console.log('Connected');
-  client.subscribe([topicRobot], () => {
+  client.subscribe([topicRobot], (err, granted) => {
+
+    //Exit on error
+    if(granted.length === 0 || err !== null){
+      console.log("An error has occured, check if the server is already running!")
+      process.kill(process.pid, 'SIGTERM');
+    }
+    
     console.log(`Subscribe to topic '${topicRobot}'`);
   });
 });
