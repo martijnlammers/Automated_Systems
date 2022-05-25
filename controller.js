@@ -1,3 +1,30 @@
+var munkres = require('munkres-js');
+function createFirstTargetSet(numberOfRobots, columns) {
+    var firstTargetSet = [];
+    var firstTarget = 0;
+    if (numberOfRobots <= 0) {
+        return firstTargetSet;
+    }
+    firstTargetSet[0] = firstTarget;
+    for (var firstTargetSetIndex = 1; firstTargetSetIndex < numberOfRobots; firstTargetSetIndex++) {
+        firstTarget = firstTargetSetIndex * columns;
+        firstTargetSet[firstTargetSetIndex] = firstTarget;
+    }
+    return firstTargetSet;
+}
+function fillTargetSets(firstTargetSet, numberOfTargetSets, targetSetPattern) {
+    var targetSets = makeEmpty2DArray(numberOfTargetSets);
+    var target;
+    for (var firstTargetSetIndex = 0; firstTargetSetIndex < firstTargetSet.length; firstTargetSetIndex++) {
+        target = firstTargetSet[firstTargetSetIndex];
+        targetSets[0].push(target);
+        for (var targetSetIndex = 0; targetSetIndex < numberOfTargetSets - 1; targetSetIndex++) {
+            target += targetSetPattern[targetSetIndex % targetSetPattern.length];
+            targetSets[targetSetIndex + 1].push(target);
+        }
+    }
+    return targetSets;
+}
 function createAdjacencyMatrix(numberOfVertices) {
     var rows, columns;
     var index, rightCel, leftCel, celUp, celDown;
@@ -56,9 +83,9 @@ function createAdjacencyMatrix(numberOfVertices) {
     }
     return adjacencyMatrix;
 }
-function makeEmptyArray(numberOfVertices) {
+function makeEmpty2DArray(numberOfRows) {
     var array = [];
-    for (var index = 0; index < numberOfVertices; index++) {
+    for (var index = 0; index < numberOfRows; index++) {
         array.push([]);
     }
     return array;
@@ -66,8 +93,8 @@ function makeEmptyArray(numberOfVertices) {
 ;
 function breadthFirstSearch(startVertex, numberOfVertices) {
     var adjacencyMatrix = createAdjacencyMatrix(numberOfVertices);
-    var previous = makeEmptyArray(numberOfVertices);
-    var visited = new Array(9).fill(false);
+    var previous = makeEmpty2DArray(numberOfVertices);
+    var visited = new Array(numberOfVertices).fill(false);
     var queue = [startVertex];
     visited[startVertex] = true;
     while (queue.length > 0) {
@@ -84,18 +111,46 @@ function breadthFirstSearch(startVertex, numberOfVertices) {
     return previous;
 }
 ;
-function traceRoute(previous, startVertex, endVertex) {
-    var path = [endVertex];
-    var previousStep = previous[endVertex][0];
+function traceRoute(previous, startVertex, targetVertex) {
+    if (startVertex == targetVertex) {
+        return [];
+    }
+    var path = [targetVertex];
+    var previousStep = previous[targetVertex][0];
+    console.log(previous);
     while (previousStep != startVertex) {
         path.push(previousStep);
         previousStep = previous[previousStep][0];
     }
     return path.reverse();
 }
-var numberOfVertices = 4;
-var startVertex = 0;
-var endVertex = 2;
-var shortestPathStartToEnd = traceRoute(breadthFirstSearch(startVertex, numberOfVertices), startVertex, endVertex);
-console.log("Shortest path from:", startVertex, "To", endVertex, "is", shortestPathStartToEnd);
-console.log("Lenght shortest path is:", shortestPathStartToEnd.length);
+function createCostMatrix(numberOfRobots, targetSet) {
+    var startVertex, targetVertex;
+    var numberOfTargets = targetSet.length;
+    var costMatrix = makeEmpty2DArray(numberOfRobots);
+    var shortestPathStartToTarget;
+    for (var robotIndex = 0; robotIndex < numberOfRobots; robotIndex++) {
+        for (var targetIndex = 0; targetIndex < numberOfTargets; targetIndex++) {
+            startVertex = startVertexMatrix[robotIndex];
+            targetVertex = targetSet[targetIndex];
+            shortestPathStartToTarget = traceRoute(breadthFirstSearch(startVertex, numberOfVertices), startVertex, targetVertex);
+            costMatrix[robotIndex][targetIndex] = shortestPathStartToTarget.length;
+        }
+    }
+    return costMatrix;
+}
+;
+var numberOfVertices = 9;
+var numberOfRobots = 3;
+var rows, columns;
+rows = columns = Math.sqrt(numberOfVertices);
+var numberOfTargetSets = Math.round((rows / numberOfRobots) * 2);
+var targetSetPattern = [rows - 1, numberOfRobots * rows, -(rows - 1), numberOfRobots * rows];
+var firstTargetSet = createFirstTargetSet(numberOfRobots, columns);
+var startVertexMatrix = [1, 2, 3];
+var targetVertexMatrix = fillTargetSets(firstTargetSet, numberOfTargetSets, targetSetPattern);
+var costMatrix = createCostMatrix(numberOfRobots, targetVertexMatrix[0]);
+var assignment = munkres(costMatrix);
+console.log(targetVertexMatrix);
+console.log(costMatrix);
+console.log(assignment);
