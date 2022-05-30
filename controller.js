@@ -117,14 +117,13 @@ function traceRoute(previous, startVertex, targetVertex) {
     }
     var path = [targetVertex];
     var previousStep = previous[targetVertex][0];
-    console.log(previous);
     while (previousStep != startVertex) {
         path.push(previousStep);
         previousStep = previous[previousStep][0];
     }
     return path.reverse();
 }
-function createCostMatrix(numberOfRobots, targetSet) {
+function createCostMatrix(numberOfRobots, numberOfVertices, startVertexMatrix, targetSet) {
     var startVertex, targetVertex;
     var numberOfTargets = targetSet.length;
     var costMatrix = makeEmpty2DArray(numberOfRobots);
@@ -140,17 +139,21 @@ function createCostMatrix(numberOfRobots, targetSet) {
     return costMatrix;
 }
 ;
+/* Example code for using functions above.
 var numberOfVertices = 9;
 var numberOfRobots = 3;
 var rows, columns;
 rows = columns = Math.sqrt(numberOfVertices);
-var numberOfTargetSets = Math.round((rows / numberOfRobots) * 2);
-var targetSetPattern = [rows - 1, numberOfRobots * rows, -(rows - 1), numberOfRobots * rows];
+
+var startVertexMatrix = [1,2,3];
 var firstTargetSet = createFirstTargetSet(numberOfRobots, columns);
-var startVertexMatrix = [1, 2, 3];
+var numberOfTargetSets = Math.round((rows / numberOfRobots) * 2);
+var targetSetPattern = [rows-1, numberOfRobots * rows, -(rows - 1), numberOfRobots * rows];
 var targetVertexMatrix = fillTargetSets(firstTargetSet, numberOfTargetSets, targetSetPattern);
-var costMatrix = createCostMatrix(numberOfRobots, targetVertexMatrix[0]);
-var assignment = munkres(costMatrix);
-console.log(targetVertexMatrix);
-console.log(costMatrix);
-console.log(assignment);
+
+var costMatrix = createCostMatrix(numberOfRobots, numberOfVertices, startVertexMatrix ,targetVertexMatrix[0]);
+var optimalAssignment = munkres(costMatrix);
+
+console.log(optimalAssignment);
+*/
+module.exports = { createFirstTargetSet: createFirstTargetSet, fillTargetSets: fillTargetSets, createAdjacencyMatrix: createAdjacencyMatrix, makeEmpty2DArray: makeEmpty2DArray, breadthFirstSearch: breadthFirstSearch, traceRoute: traceRoute, createCostMatrix: createCostMatrix };
