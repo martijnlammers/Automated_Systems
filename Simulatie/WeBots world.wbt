@@ -4,7 +4,7 @@ WorldInfo {
 Viewpoint {
   fieldOfView 1.1
   orientation -0.5352888796691113 0.13842235749717907 0.8332497022186751 2.7528112274418755
-  position -0.28994263673698395 -0.6776296001272988 1.2997247866802841
+  position 2.2827787152219354 -1.8699924378532806 7.573355972925617
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -338,7 +338,7 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.042967600000000016 -0.03998419999999926 -1.4646688533897225e-05
+        translation 0.042967600000000016 -0.03998419999999926 -1.4646688533897227e-05
         rotation 0.5775878543036479 0.5773364105941207 -0.5771264502370386 4.189461501737441
         children [
           DEF wheel_left Shape {
@@ -402,7 +402,7 @@ Robot {
   boundingObject USE Body1
   physics Physics {
   }
-  controller "controller"
+  controller "pyController"
 }
 Floor {
   translation -0.45 -2.78 0.01

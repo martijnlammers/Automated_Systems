@@ -1,5 +1,17 @@
 // Automated Systems Webots simulation controller.
 // Martijn Lammers
+
+
+/* Notable bugs:
+*  - If the robot doesn't reach the destination withing the positional accuracy,
+*  it will get angry and decide to run from the problem, just like an upset adolecent. 
+*  If this happens, the constant POS_MATCHING_ACC needs to be higher. 
+*  (Increase in increments of 0.005)
+*  
+*
+*
+*/
+
 #include <webots/Robot.hpp>
 #include <webots/Motor.hpp>
 #include <webots/GPS.hpp>
@@ -17,7 +29,7 @@
 
 
 // Please don't touch these.
-#define POS_MATCHING_ACC 0.025
+#define POS_MATCHING_ACC 0.005
 #define ANGLE_ACCURACY 0.001
 
 using namespace webots;
@@ -28,10 +40,10 @@ Robot *r = new Robot();
 Motor *motors[2] = {r->getMotor("wheel_left"), r->getMotor("wheel_right")};
 GPS *m_gps = r->getGPS("middleGPS");
 GPS *f_gps = r->getGPS("frontGPS");
-LightSensor *lightsensor = r->getLightSensor()
+LightSensor *lightsensor = r->getLightSensor("light sensor");
 bool found_target = false;
-vector<double> destinationCoordinates{-1.178e-05, -0.00948605};
-//vector<double> destinationCoordinates{-0.4, -0.13};
+// vector<double> destinationCoordinates{-1.178e-05, -0.00948605};
+vector<double> destinationCoordinates{-0.4, -0.13};
 
 // Basic movement for the robot.
 void motorStop(){
@@ -150,6 +162,7 @@ void moveRobot(vector<double> &destination){
      r->step(1);
      const double *m_robotPos = m_gps->getValues();
      vector<vector<double>> vectors = getVectors(destination);
+     
      // Quits function when the destination equals the current position.
      if (fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC &&
       fabs(m_robotPos[1] - destination[1]) < POS_MATCHING_ACC) return;
