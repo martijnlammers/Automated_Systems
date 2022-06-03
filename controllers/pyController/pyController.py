@@ -9,9 +9,15 @@
 # (Increase in increments of 0.005)
 
 from controller import Robot, Motor, GPS, LightSensor
-import math
+import math as m
+import paho.mqtt.client as mqtt
+import uuid
 
 # Constants and variables.
+HOST = "145.24.222.37"
+PORT = 8005
+USERNAME = "robots"
+PASSWORD = "robots"
 TIME_STEP = 64
 ROTATE_SPEED = 0.07
 MAX_SPEED = 18
@@ -30,9 +36,21 @@ motors = [robot.getDevice("wheel_left"), robot.getDevice("wheel_right")];
 m_gps = robot.getDevice("middleGPS")
 f_gps = robot.getDevice("frontGPS")
 lightsensor = robot.getDevice("light sensor")
-found_target = False
 destinationCoordinates = [-0.4, -0.13]
+client = mqtt.Client()
+uuid = uuid.uuid4().hex
 
+
+# Set up of sensors and actuators used by the robot.
+
+def initializeRobot():
+    f_gps.enable(TIME_STEP)
+    m_gps.enable(TIME_STEP)
+    lightsensor.enable(TIME_STEP)
+    motors[LEFT].setPosition(float('inf'))
+    motors[RIGHT].setPosition(float('inf'))
+    motorStop()
+    
 # Basic movement for the robot.
 
 def motorStop():
@@ -55,16 +73,6 @@ def motorRotateRight(speed_multiplier):
     motors[RIGHT].setVelocity(speed_multiplier * -ROTATE_SPEED)
     robot.step(1)
 
-# Set up of sensors and actuators used by the robot.
-
-def initializeRobot():
-    f_gps.enable(TIME_STEP)
-    m_gps.enable(TIME_STEP)
-    lightsensor.enable(TIME_STEP)
-    motors[LEFT].setPosition(float('inf'))
-    motors[RIGHT].setPosition(float('inf'))
-    motorStop()
-
 # Math source: https://www.cuemath.com/geometry/angle-between-vectors/
 # Calculates the rotation to the target.
   
@@ -72,9 +80,9 @@ def calculateAngleToTarget(vectors):
     a, b = vectors[0][0], vectors[0][1]
     c, d = vectors[1][0], vectors[1][1]
     dotProduct = ((a * c) + (b * d));
-    return math.acos(dotProduct / \
-    (math.sqrt(math.pow(a, 2) + math.pow(b,2)) \
-    * math.sqrt(math.pow(c, 2) + math.pow(d,2)))) \
+    return m.acos(dotProduct / \
+    (m.sqrt(m.pow(a, 2) + m.pow(b,2)) \
+    * m.sqrt(m.pow(c, 2) + m.pow(d,2)))) \
     * 57.2957795;
     
 def getVectors(destination):
@@ -127,7 +135,7 @@ def moveToTarget(destination):
     while(condition):
         vectors = getVectors(destination)
         a, b = vectors[0][0], vectors[0][1]   
-        length = math.sqrt(math.pow(a, 2) + math.pow(b,2))
+        length = m.sqrt(m.pow(a, 2) + m.pow(b,2))
         motorMoveForward(length)
         condition = (length > POS_MATCHING_ACC)   
     motorStop()
@@ -140,8 +148,8 @@ def moveRobot(destination):
      
      # Quits function when the destination equals the current position.
      
-     if (math.fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC and  \
-     math.fabs(m_robotPos[1] - destination[1]) < POS_MATCHING_ACC): 
+     if (m.fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC and  \
+     m.fabs(m_robotPos[1] - destination[1]) < POS_MATCHING_ACC): 
          return
          
      vectors = getVectors(destination)
@@ -151,12 +159,39 @@ def moveRobot(destination):
      rotateToTarget(destination)
      moveToTarget(destination)
 
-
+# MQTT functions
+  
+def on_connect(client, userdata, flags, rc):
+    print("connected, res code: " + str(rc)) 
+    client.subscribe("robots/toRobot/#")
+ 
+def on_message(client, userdata, msg):
+    topic = str(msg.topic)
+    message = str(msg.payload.decode("utf-8"))
+    print(topic + " " + message)
+    client.unsubscribe("robots/toRobot/register/" + uuid)
+    
+def initializeMQTTClient():
+    client.on_connect = on_connect
+    client.on_message = on_message
+    client.connect(HOST, PORT, 60)
+    client.subscribe("robots/toRobot/register/" + uuid)
 
 if __name__ == "__main__":
-    print("Hello, World!")
-    robot.step(1)
     initializeRobot()
-    moveRobot(destinationCoordinates)
+    initializeMQTTClient()
+    while(robot.step(TIME_STEP) != -1):
+        robot.step(1)
+        # client.loop()
+        # moveRobot(destinationCoordinates)
+        
+        
+    
+    
+    
+    # moveRobot(destinationCoordinates)
+
+ 
+        
 
 
