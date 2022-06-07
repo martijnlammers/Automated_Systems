@@ -12,6 +12,7 @@ from controller import Robot, Motor, GPS, LightSensor
 import math as m
 import paho.mqtt.client as mqtt
 import uuid
+import json
 
 # Constants and variables.
 HOST = "145.24.222.37"
@@ -20,16 +21,18 @@ USERNAME = "robots"
 PASSWORD = "robots"
 TIME_STEP = 64
 ROTATE_SPEED = 0.07
-MAX_SPEED = 18
+MAX_SPEED = 8
 LEFT = 0
 RIGHT = 1
 NUM_MOTORS = 2
+ACTION = 2
+POS_MARGIN = 0.1
 
 # Don't touch these preferably.
 # It will mess up the movements.
 
-POS_MATCHING_ACC = 0.005
-ANGLE_ACCURACY = 0.001
+POS_MATCHING_ACC = 0.07
+ANGLE_ACCURACY = 0.0000000001
 
 robot = Robot()
 motors = [robot.getDevice("wheel_left"), robot.getDevice("wheel_right")];
@@ -39,6 +42,7 @@ lightsensor = robot.getDevice("light sensor")
 destinationCoordinates = [-0.4, -0.13]
 client = mqtt.Client()
 uuid = uuid.uuid4().hex
+robotId = None
 
 
 # Set up of sensors and actuators used by the robot.
@@ -58,9 +62,9 @@ def motorStop():
     motors[RIGHT].setVelocity(0)
     robot.step(1)
 
-def motorMoveForward(speed_multiplier):
-    motors[LEFT].setVelocity(speed_multiplier * MAX_SPEED)
-    motors[RIGHT].setVelocity(speed_multiplier * MAX_SPEED)
+def motorMoveForward():
+    motors[LEFT].setVelocity(MAX_SPEED)
+    motors[RIGHT].setVelocity(MAX_SPEED)
     robot.step(1)
 
 def motorRotateLeft(speed_multiplier):
@@ -84,6 +88,7 @@ def calculateAngleToTarget(vectors):
     (m.sqrt(m.pow(a, 2) + m.pow(b,2)) \
     * m.sqrt(m.pow(c, 2) + m.pow(d,2)))) \
     * 57.2957795;
+    # ^ Converting radians to degrees by multiplying by 57.29...
     
 def getVectors(destination):
     m_robotPos = m_gps.getValues()
@@ -134,10 +139,11 @@ def moveToTarget(destination):
     condition = True
     while(condition):
         vectors = getVectors(destination)
+        print(vectors)
         a, b = vectors[0][0], vectors[0][1]   
-        length = m.sqrt(m.pow(a, 2) + m.pow(b,2))
-        motorMoveForward(length)
-        condition = (length > POS_MATCHING_ACC)   
+        length = abs(m.sqrt(m.pow(a, 2) + m.pow(b,2))) - POS_MARGIN
+        motorMoveForward()
+        condition = (length > POS_MATCHING_ACC)  
     motorStop()
     return
 
@@ -159,37 +165,51 @@ def moveRobot(destination):
      rotateToTarget(destination)
      moveToTarget(destination)
 
+def translateCoordinates(coordinates):
+    return [(((coordinates[0])/100) - 1.67),\
+    (((coordinates[1])/100 )-2.80)]
 # MQTT functions
   
 def on_connect(client, userdata, flags, rc):
-    print("connected, res code: " + str(rc)) 
+    print("Robot connected successfully, response code: " + str(rc)) 
     client.subscribe("robots/toRobot/#")
  
 def on_message(client, userdata, msg):
-    topic = str(msg.topic)
-    message = str(msg.payload.decode("utf-8"))
-    print(topic + " " + message)
-    client.unsubscribe("robots/toRobot/register/" + uuid)
+    topics = str(msg.topic).split("/")
+    action = topics[ACTION]
+    payload = str(msg.payload.decode("utf-8"))
+    print(action + " " + payload)
+    if(action.__eq__("register")):
+        robotId = payload
+        client.unsubscribe("robots/toRobot/register/" + uuid)
+        client.subscribe(f"robots/toRobot/{robotId}")
+        
+        # The MQTT format changes after registration
+        # so the topic index also has to change.
+        
+        ACTION = 3
+    else:
+        print("wat")
+    
+    
+    
+    
     
 def initializeMQTTClient():
     client.on_connect = on_connect
     client.on_message = on_message
+    client.username_pw_set(USERNAME, PASSWORD)
     client.connect(HOST, PORT, 60)
     client.subscribe("robots/toRobot/register/" + uuid)
+    client.publish("robots/toServer/register/" + uuid, "")
 
 if __name__ == "__main__":
     initializeRobot()
     initializeMQTTClient()
-    while(robot.step(TIME_STEP) != -1):
-        robot.step(1)
+    # while(robot.step(TIME_STEP) != -1):
         # client.loop()
-        # moveRobot(destinationCoordinates)
-        
-        
-    
-    
-    
-    # moveRobot(destinationCoordinates)
+        # robot.step(1)
+    moveRobot(translateCoordinates([0,399]))
 
  
         
