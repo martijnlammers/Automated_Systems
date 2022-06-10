@@ -20,20 +20,20 @@ function createFirstTargetSet(numberOfRobots, columns) {
 };
 
 function fillTargetSets(firstTargetSet, numberOfTargetSets, targetSetPattern) {
-var targetSets = makeEmpty2DArray(numberOfTargetSets);
-var target;
+    var targetSets = makeEmpty2DArray(numberOfTargetSets);
+    var target;
 
-for (let firstTargetSetIndex = 0; firstTargetSetIndex < firstTargetSet.length; firstTargetSetIndex++) {
-    target = firstTargetSet[firstTargetSetIndex];
-    targetSets[0].push(target);
+    for (let firstTargetSetIndex = 0; firstTargetSetIndex < firstTargetSet.length; firstTargetSetIndex++) {
+        target = firstTargetSet[firstTargetSetIndex];
+        targetSets[0].push(target);
 
-    for (let targetSetIndex = 0; targetSetIndex < numberOfTargetSets - 1; targetSetIndex++) {
-    target += targetSetPattern[targetSetIndex % targetSetPattern.length];
-    targetSets[targetSetIndex + 1].push(target);
+        for (let targetSetIndex = 0; targetSetIndex < numberOfTargetSets - 1; targetSetIndex++) {
+        target += targetSetPattern[targetSetIndex % targetSetPattern.length];
+        targetSets[targetSetIndex + 1].push(target);
+        }
     }
-}
 
-return targetSets;
+    return targetSets;
 };
 
 function createAdjacencyMatrix(numberOfVertices) {
@@ -49,49 +49,56 @@ function createAdjacencyMatrix(numberOfVertices) {
             rightCel = index + 1;
             celUp = index - columns;
             celDown = index + columns;
-
-            if (currentRow == 0 && currentColumn == 0) { // TOP LEFT
-                adjacencyMatrix[index][rightCel] = 1;
-                adjacencyMatrix[index][celDown] = 1;
+            
+            if (currentRow == 0) { 
+                if (currentColumn == 0) { // TOP LEFT
+                    adjacencyMatrix[index][rightCel] = 1;
+                    adjacencyMatrix[index][celDown] = 1;
+                }
+                else if (currentColumn != columns - 1) { // TOP CENTER
+                    adjacencyMatrix[index][rightCel] = 1;
+                    adjacencyMatrix[index][celDown] = 1;
+                    adjacencyMatrix[index][leftCel] = 1;
+                }
+                else if (currentColumn == columns - 1) { // TOP RIGHT
+                    adjacencyMatrix[index][celDown] = 1;
+                    adjacencyMatrix[index][leftCel] = 1;
+                }
             }
-            else if (currentRow == 0 && currentColumn != columns - 1) { // TOP CENTER
-                adjacencyMatrix[index][rightCel] = 1;
-                adjacencyMatrix[index][celDown] = 1;
-                adjacencyMatrix[index][leftCel] = 1;
+            else if (currentRow > 0 && currentRow < rows - 1) {
+                if (currentColumn == 0) { // CENTER LEFT
+                    adjacencyMatrix[index][celUp] = 1;
+                    adjacencyMatrix[index][rightCel] = 1;
+                    adjacencyMatrix[index][celDown] = 1;
+                }
+                else if (currentColumn > 0 && currentColumn < columns - 1) { // CENTER CENTER
+                    adjacencyMatrix[index][celUp] = 1;
+                    adjacencyMatrix[index][rightCel] = 1;
+                    adjacencyMatrix[index][celDown] = 1;
+                    adjacencyMatrix[index][leftCel] = 1;
+                }
+                else if (currentColumn == columns - 1) { // CENTER RIGHT
+                    adjacencyMatrix[index][celUp] = 1;
+                    adjacencyMatrix[index][leftCel] = 1;
+                    adjacencyMatrix[index][celDown] = 1;
+                }
             }
-            else if (currentRow == 0 && currentColumn == columns - 1) { // TOP RIGHT
-                adjacencyMatrix[index][celDown] = 1;
-                adjacencyMatrix[index][leftCel] = 1;
+            else if (currentRow == rows - 1) {
+                if (currentColumn == 0) { // BOTTOM LEFT
+                    adjacencyMatrix[index][celUp] = 1;
+                    adjacencyMatrix[index][rightCel] = 1;
+                }
+                else if (currentColumn > 0 && currentColumn < columns - 1) { // BOTTOM CENTER
+                    adjacencyMatrix[index][celUp] = 1;
+                    adjacencyMatrix[index][rightCel] = 1;
+                    adjacencyMatrix[index][leftCel] = 1;
+                }
+                else if (currentColumn == columns - 1) { // BOTTOM RIGHT
+                    adjacencyMatrix[index][celUp] = 1;
+                    adjacencyMatrix[index][leftCel] = 1;
+                }
             }
-            else if ((currentRow > 0 && currentRow < rows - 1) && currentColumn == 0) { // CENTER LEFT
-                adjacencyMatrix[index][celUp] = 1;
-                adjacencyMatrix[index][rightCel] = 1;
-                adjacencyMatrix[index][celDown] = 1;
-            }
-            else if ((currentRow > 0 && currentRow < rows - 1) && (currentColumn > 0 && currentColumn < columns - 1)) { // CENTER CENTER
-                adjacencyMatrix[index][celUp] = 1;
-                adjacencyMatrix[index][rightCel] = 1;
-                adjacencyMatrix[index][celDown] = 1;
-                adjacencyMatrix[index][leftCel] = 1;
-            }
-            else if ((currentRow > 0 && currentRow < rows - 1) && currentColumn == columns - 1) { // CENTER RIGHT
-                adjacencyMatrix[index][celUp] = 1;
-                adjacencyMatrix[index][leftCel] = 1;
-                adjacencyMatrix[index][celDown] = 1;
-            }
-            else if (currentRow == rows - 1 && currentColumn == 0) { // BOTTOM LEFT
-                adjacencyMatrix[index][celUp] = 1;
-                adjacencyMatrix[index][rightCel] = 1;
-            }
-            else if (currentRow == rows - 1 && (currentColumn > 0 && currentColumn < columns - 1)) { // BOTTOM CENTER
-                adjacencyMatrix[index][celUp] = 1;
-                adjacencyMatrix[index][rightCel] = 1;
-                adjacencyMatrix[index][leftCel] = 1;
-            }
-            else if (currentRow == rows - 1 && currentColumn == columns - 1) { // BOTTOM RIGHT
-                adjacencyMatrix[index][celUp] = 1;
-                adjacencyMatrix[index][leftCel] = 1;
-            }
+            
         }
     }
 
@@ -166,25 +173,25 @@ function getPathAndAssignment (adjacencyMatrix, numberOfRobots, numberOfVertices
   return [shortestPathMatrix, costMatrix];
 };
 
-// /* Example code for using functions above.
+/* Example code for using functions above.
 var numberOfVertices = 9;
 var numberOfRobots = 3;
 var rows, columns;
 rows = columns = Math.sqrt(numberOfVertices);
 
-// var startVertexVector = [1,4,7];
-// var firstTargetSet = createFirstTargetSet(numberOfRobots, columns);
-// var numberOfTargetSets = Math.round((rows / numberOfRobots) * 2);
-// var targetSetPattern = [rows-1, numberOfRobots * rows, -(rows - 1), numberOfRobots * rows];
-// var targetVertexMatrix = fillTargetSets(firstTargetSet, numberOfTargetSets, targetSetPattern);
+var startVertexVector = [1,4,7];
+var firstTargetSet = createFirstTargetSet(numberOfRobots, columns);
+var numberOfTargetSets = Math.round((rows / numberOfRobots) * 2);
+var targetSetPattern = [rows-1, numberOfRobots * rows, -(rows - 1), numberOfRobots * rows];
+var targetVertexMatrix = fillTargetSets(firstTargetSet, numberOfTargetSets, targetSetPattern);
 
-// var pathAndAssignment = getPathAndAssignment(numberOfRobots, numberOfVertices, startVertexVector, targetVertexMatrix[0]);
-// var optimalAssignment = munkres(pathAndAssignment[1]);
+var pathAndAssignment = getPathAndAssignment(numberOfRobots, numberOfVertices, startVertexVector, targetVertexMatrix[0]);
+var optimalAssignment = munkres(pathAndAssignment[1]);
 
-// console.log(targetVertexMatrix);
-// console.log(optimalAssignment);
-// console.log(pathAndAssignment[1]);
-// console.log(pathAndAssignment[0]);
-// */
+console.log(targetVertexMatrix);
+console.log(optimalAssignment);
+console.log(pathAndAssignment[1]);
+console.log(pathAndAssignment[0]);
+*/
 
 module.exports = { createFirstTargetSet, fillTargetSets, createAdjacencyMatrix, makeEmpty2DArray, breadthFirstSearch, traceRoute, getPathAndAssignment };
