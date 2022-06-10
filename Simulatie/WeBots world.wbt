@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.3313494142857598 -0.026179755878292108 -0.9431448383120363 3.23260258220611
-  position 0.9888999793802913 -1.7617043759131654 1.1983817802542995
+  orientation 0.48483805614175385 -0.06280210471682927 -0.8723462357113843 3.3271789200765114
+  position 0.4196179421167334 -1.9390814379435248 2.0084625599579717
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -33,7 +33,6 @@ Wall {
   size 3.3 0.2 2.4
 }
 Door {
-  hidden translation_5 0.0010000016231462294 5.091561061654204e-10 0
   translation -2.25 -1.45 0
   position -9.063669077058667e-09
 }
@@ -338,8 +337,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation 2.0808350696134632e-07 0.06000013720082944 -0.01999994401026715
-        rotation -0.006764711875393936 -0.49077374770726323 0.8712607917464267 2.93605804070826
+        translation 2.0808350696140313e-07 0.06000013720082944 -0.01999994401026715
+        rotation -0.0067647118753946895 -0.4907737477072637 0.8712607917464266 2.93605804070826
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -381,8 +380,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.04296759999999948 -0.03998533275439961 -1.5780918589555588e-05
-        rotation 0.5913908913138903 0.5487004486007563 -0.5909184642370648 4.14595657172952
+        translation 0.04296759999999934 -0.03998533275439961 -1.5780918589553477e-05
+        rotation 0.5913908913138903 0.5487004486007562 -0.5909184642370647 4.14595657172952
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -413,8 +412,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.04203159999999952 -0.03991957921917968 -1.0613459258771642e-05
-        rotation 0.567860001771971 0.5963095196756452 -0.567406358029004 4.21769871549188
+        translation -0.04203159999999952 -0.03991957921917968 -1.0613459258772896e-05
+        rotation 0.567860001771971 0.5963095196756453 -0.567406358029004 4.21769871549188
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -442,258 +441,6 @@ Robot {
       }
     }
   ]
-  name "robot(2)"
-  boundingObject USE Body1
-  physics Physics {
-  }
-  controller "pyController"
-}
-Robot {
-  translation -0.336566 -1.27793 0.109977
-  rotation -0.000799069369701861 -0.0003873015235224926 -0.9999996057427584 0.17174329533064378
-  children [
-    DistanceSensor {
-      translation 0.02 -0.07 0.004
-      rotation 0 0 1 -1.5707953071795862
-      children [
-        Solid {
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 1 0 0
-              }
-              geometry Box {
-                size 0.0025 0.01 0.0125
-              }
-            }
-          ]
-        }
-      ]
-      type "infra-red"
-    }
-    DistanceSensor {
-      translation 1.12124e-13 -0.07 -0.00270004
-      rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 2.09439
-      children [
-        Solid {
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 1 0 0
-              }
-              geometry Box {
-                size 0.0025 0.01 0.00675
-              }
-            }
-          ]
-        }
-      ]
-      name "ground_ds"
-      type "infra-red"
-    }
-    LightSensor {
-      translation 0.007 -0.07 0.013
-      rotation 0 0 1 -1.5707953071795862
-      children [
-        Solid {
-          translation 0 -0.02 0
-          children [
-            Shape {
-              appearance PBRAppearance {
-                baseColor 1 1 0
-              }
-              geometry Box {
-                size 0.002 0.01 0.01
-              }
-            }
-          ]
-        }
-      ]
-    }
-    GPS {
-      children [
-        Solid {
-          translation 0 0 0.01
-          children [
-            Shape {
-              appearance PBRAppearance {
-              }
-              geometry Cylinder {
-                height 0.01
-                radius 0.0025
-              }
-            }
-          ]
-        }
-      ]
-      name "middleGPS"
-    }
-    GPS {
-      translation 0 -0.07 0
-      children [
-        Solid {
-          translation 0 0 0.01
-          rotation 0 0 1 3.14159
-          children [
-            Shape {
-              appearance PBRAppearance {
-              }
-              geometry Cylinder {
-                height 0.01
-                radius 0.0025
-              }
-            }
-          ]
-        }
-      ]
-      name "frontGPS"
-    }
-    Solid {
-      translation 0 0 0.003
-      children [
-        Shape {
-          appearance PBRAppearance {
-          }
-          geometry Box {
-            size 0.08 0.15 0.003125
-          }
-        }
-      ]
-      name "solid(2)"
-    }
-    Solid {
-      translation 0 0 0.006
-      rotation 0 1 0 0
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColor 0.666667 0 1
-          }
-          geometry Box {
-            size 0.08 0.15 0.003125
-          }
-        }
-      ]
-      name "solid(3)"
-    }
-    BallJoint {
-      jointParameters BallJointParameters {
-        position -5.262530123182595
-        anchor 0 0.06 -0.02
-      }
-      jointParameters2 JointParameters {
-        position -19.462071878532804
-      }
-      jointParameters3 JointParameters {
-        position 55.5981530276073
-        axis 0 1 0
-      }
-      endPoint Solid {
-        translation 2.0808350696134632e-07 0.06000013720082944 -0.01999994401026715
-        rotation -0.006764711875393936 -0.49077374770726323 0.8712607917464267 2.93605804070826
-        children [
-          DEF caster Shape {
-            appearance PBRAppearance {
-            }
-            geometry Sphere {
-              radius 0.01
-            }
-          }
-        ]
-        boundingObject USE caster
-        physics Physics {
-        }
-      }
-    }
-    Solid {
-      translation 0 0.06 -0.01
-      children [
-        Shape {
-          appearance PBRAppearance {
-            baseColor 0 0 0
-          }
-          geometry Cylinder {
-            height 0.017
-            radius 0.011
-          }
-        }
-      ]
-      name "solid(1)"
-    }
-    HingeJoint {
-      jointParameters HingeJointParameters {
-        position -0.07442132243636917
-        anchor 0 -0.04 0
-      }
-      device [
-        DEF wheel_left RotationalMotor {
-          name "wheel_left"
-          maxVelocity 30
-        }
-      ]
-      endPoint DEF wheel_left Solid {
-        translation 0.04296759999999948 -0.03998533275439961 -1.5780918589555588e-05
-        rotation 0.5913908913138903 0.5487004486007563 -0.5909184642370648 4.14595657172952
-        children [
-          DEF wheel_left Shape {
-            appearance PBRAppearance {
-              baseColor 0.145098 0.145098 0.145098
-              metalness 0
-            }
-            geometry Cylinder {
-              height 0.005
-              radius 0.03
-            }
-          }
-        ]
-        name "wheel_left"
-        boundingObject USE wheel_left
-        physics DEF Physics_wh Physics {
-        }
-      }
-    }
-    HingeJoint {
-      jointParameters HingeJointParameters {
-        position 0.04930260254341303
-        anchor 0 -0.04 0
-      }
-      device [
-        DEF wheel_right RotationalMotor {
-          name "wheel_right"
-          maxVelocity 30
-        }
-      ]
-      endPoint DEF wheel_right Solid {
-        translation -0.04203159999999952 -0.03991957921917968 -1.0613459258771642e-05
-        rotation 0.567860001771971 0.5963095196756452 -0.567406358029004 4.21769871549188
-        children [
-          DEF wheel_right Shape {
-            appearance PBRAppearance {
-              baseColor 0.145098 0.145098 0.145098
-              metalness 0
-            }
-            geometry Cylinder {
-              height 0.005
-              radius 0.03
-            }
-          }
-        ]
-        name "wheel_right"
-        boundingObject USE wheel_right
-        physics DEF Physics_wh Physics {
-        }
-      }
-    }
-    DEF Body1 Shape {
-      appearance PBRAppearance {
-        baseColor 1 0.666667 1
-      }
-      geometry Box {
-        size 0.08 0.15 0.003125
-      }
-    }
-  ]
-  name "robot(1)"
   boundingObject USE Body1
   physics Physics {
   }
