@@ -14,7 +14,9 @@ import paho.mqtt.client as mqtt
 import uuid
 import json
 
+# Don't touch these preferably.
 # Constants and variables.
+
 HOST = "145.24.222.37"
 PORT = 8005
 USERNAME = "robots"
@@ -27,13 +29,10 @@ RIGHT = 1
 NUM_MOTORS = 2
 ACTION = 2
 POS_MARGIN = 0.1
-
-# Don't touch these preferably.
-# It will mess up the movements.
-
 POS_MATCHING_ACC = 0.07
 ANGLE_ACCURACY = 0.0000000001
 
+# Global variables.
 robot = Robot()
 motors = [robot.getDevice("wheel_left"), robot.getDevice("wheel_right")];
 m_gps = robot.getDevice("middleGPS")
@@ -43,6 +42,7 @@ destinationCoordinates = [-0.4, -0.13]
 client = mqtt.Client()
 uuid = uuid.uuid4().hex
 robotId = None
+state = "NO_TASK" # | PROCESSING | 
 
 
 # Set up of sensors and actuators used by the robot.
@@ -139,7 +139,6 @@ def moveToTarget(destination):
     condition = True
     while(condition):
         vectors = getVectors(destination)
-        print(vectors)
         a, b = vectors[0][0], vectors[0][1]   
         length = abs(m.sqrt(m.pow(a, 2) + m.pow(b,2))) - POS_MARGIN
         motorMoveForward()
@@ -169,21 +168,30 @@ def translateCoordinates(coordinates):
     return [(((coordinates[0])/100) - 1.67),\
     (((coordinates[1])/100 )-2.80)]
 # MQTT functions
-  
+def publishToServer(client, topic, message):
+    global robotId
+    client.publish(topic, message, 1)
+    print(str(robotId) + " publishing to: " + str(topic))
+    print(str(robotId) + " message: " + str(message))
+    
 def on_connect(client, userdata, flags, rc):
     print("Robot connected successfully, response code: " + str(rc)) 
-    client.subscribe("robots/toRobot/#")
+    
  
 def on_message(client, userdata, msg):
+    global ACTION, robotId
     topics = str(msg.topic).split("/")
     action = topics[ACTION]
     payload = str(msg.payload.decode("utf-8"))
-    print(action + " " + payload)
+    print(action + " " + payload + " " + uuid)
+    
     if(action.__eq__("register")):
         robotId = payload
         client.unsubscribe("robots/toRobot/register/" + uuid)
-        client.subscribe(f"robots/toRobot/{robotId}")
-        
+        client.subscribe("robots/toRobot/" + robotId + "/#")
+        publishToServer(client, "robots/toServer/" + robotId + "/state", "NO_TASK")
+        publishToServer(client, "robots/toServer" + robotId + "/model", "VIRTUAL")
+        publishToServer(client, "robots/toServer/" + robotId + "/simulation", "BEGIN")
         # The MQTT format changes after registration
         # so the topic index also has to change.
         
@@ -199,17 +207,18 @@ def initializeMQTTClient():
     client.on_connect = on_connect
     client.on_message = on_message
     client.username_pw_set(USERNAME, PASSWORD)
-    client.connect(HOST, PORT, 60)
+    client.connect(HOST, PORT, 5)
     client.subscribe("robots/toRobot/register/" + uuid)
     client.publish("robots/toServer/register/" + uuid, "")
 
 if __name__ == "__main__":
     initializeRobot()
-    initializeMQTTClient()
-    # while(robot.step(TIME_STEP) != -1):
-        # client.loop()
-        # robot.step(1)
-    moveRobot(translateCoordinates([0,399]))
+    # initializeMQTTClient()
+    while(robot.step(TIME_STEP) != -1):
+        client.loop()
+        robot.step(1)
+        # print(str(lightsensor.getValue()) + " " + uuid)
+    # moveRobot(translateCoordinates([0,399]))
 
  
         
