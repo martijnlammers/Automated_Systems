@@ -157,6 +157,7 @@ def moveToTarget(destination):
         # Send MQTT data
         # found_target = False
     elif(obstacle):
+        pass
         # Send MQTT data 
         # obstacle = False
     return
@@ -206,7 +207,7 @@ def on_message(client, userdata, msg):
         client.subscribe("robots/toRobot/" + robotId + "/#")
         publishToServer(client, "robots/toServer/" + robotId + "/state", "NO_TASK")
         publishToServer(client, "robots/toServer" + robotId + "/model", "VIRTUAL")
-        publishToServer(client, "robots/toServer/" + robotId + "/simulation", "BEGIN")
+        publishToServer(client, "robots/toServer/" + robotId + "/begin", "true")
         # The MQTT format changes after registration
         # so the topic index also has to change.
         
