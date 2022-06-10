@@ -8,7 +8,7 @@
 # If this happens, the constant POS_MATCHING_ACC needs to be higher. 
 # (Increase in increments of 0.005)
 
-from controller import Robot, Motor, GPS, LightSensor
+from controller import Robot, Motor, GPS, LightSensor, DistanceSensor
 import math as m
 import paho.mqtt.client as mqtt
 import uuid
@@ -38,11 +38,15 @@ motors = [robot.getDevice("wheel_left"), robot.getDevice("wheel_right")];
 m_gps = robot.getDevice("middleGPS")
 f_gps = robot.getDevice("frontGPS")
 lightsensor = robot.getDevice("light sensor")
+distancesensor = robot.getDevice("distance sensor")
+groundsensor = robot.getDevice("ground_ds")
 destinationCoordinates = [-0.4, -0.13]
 client = mqtt.Client()
 uuid = uuid.uuid4().hex
 robotId = None
 state = "NO_TASK" # | PROCESSING | 
+found_target = False
+obstacle = False
 
 
 # Set up of sensors and actuators used by the robot.
@@ -51,6 +55,8 @@ def initializeRobot():
     f_gps.enable(TIME_STEP)
     m_gps.enable(TIME_STEP)
     lightsensor.enable(TIME_STEP)
+    distancesensor.enable(TIME_STEP)
+    groundsensor.enable(TIME_STEP)
     motors[LEFT].setPosition(float('inf'))
     motors[RIGHT].setPosition(float('inf'))
     motorStop()
@@ -131,19 +137,28 @@ def rotateToTarget(destination):
     return
 
 def moveToTarget(destination):
-    
+    global found_target, obstacle
     # The condition variable is used to 
     # constructs a do-while loop, which 
     # don't exist in Python.
     
     condition = True
-    while(condition):
+    while(condition and not found_target and not obstacle):
         vectors = getVectors(destination)
         a, b = vectors[0][0], vectors[0][1]   
         length = abs(m.sqrt(m.pow(a, 2) + m.pow(b,2))) - POS_MARGIN
         motorMoveForward()
+        found_target = True if (lightsensor.getValue() > 500) else False
+        obstacle = True if (groundsensor.getValue() == 1000 or distancesensor.getValue() <= 400) else False 
         condition = (length > POS_MATCHING_ACC)  
     motorStop()
+    if(found_target):
+        pass
+        # Send MQTT data
+        # found_target = False
+    elif(obstacle):
+        # Send MQTT data 
+        # obstacle = False
     return
 
 
@@ -214,11 +229,10 @@ def initializeMQTTClient():
 if __name__ == "__main__":
     initializeRobot()
     # initializeMQTTClient()
-    while(robot.step(TIME_STEP) != -1):
-        client.loop()
-        robot.step(1)
-        # print(str(lightsensor.getValue()) + " " + uuid)
-    # moveRobot(translateCoordinates([0,399]))
+    # while(robot.step(TIME_STEP) != -1):
+        # client.loop()
+        # robot.step(1)
+    moveRobot(translateCoordinates([0,399]))
 
  
         
