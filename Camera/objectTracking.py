@@ -97,3 +97,14 @@ def drawGrid():
 
 drawGrid()  #Always draw a grid to make sure it is initialized properly
 
+#Takes pixel position and converts it to a grid position
+def objPositionOnGrid(xPos, yPos):
+    gridPosX = int(xPos / grid.width)
+    gridPosY = int(yPos / grid.height)
+    gridNum = gridPosX + (gridPosY * grid.xGridSize)
+
+    print(f"grX: {gridPosX}, grY: {gridPosY}, grNum: {gridNum}")
+    cv2.circle(frame, (xPos, yPos), 10, (0,255,255), cv2.FILLED)
+
+    drawGrid()  #Visually draw the grid
+
