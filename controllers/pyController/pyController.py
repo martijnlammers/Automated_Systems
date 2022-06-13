@@ -8,7 +8,7 @@
 # If this happens, the constant POS_MATCHING_ACC needs to be higher. 
 # (Increase in increments of 0.005)
 
-from controller import Robot, Motor, GPS, LightSensor, DistanceSensor
+from controller import Robot, Motor, GPS, LightSensor, DistanceSensor, InertialUnit
 import math as m
 import paho.mqtt.client as mqtt
 import uuid
@@ -21,7 +21,7 @@ HOST = "145.24.222.37"
 PORT = 8005
 USERNAME = "robots"
 PASSWORD = "robots"
-TIME_STEP = 64
+TIME_STEP = 32
 ROTATE_SPEED = 0.07
 MAX_SPEED = 8
 LEFT = 0
@@ -30,7 +30,7 @@ NUM_MOTORS = 2
 ACTION = 2
 POS_MARGIN = 0.1
 POS_MATCHING_ACC = 0.07
-ANGLE_ACCURACY = 0.0000000001
+ANGLE_ACCURACY = 0.000000001
 
 # Global variables.
 robot = Robot()
@@ -40,6 +40,7 @@ f_gps = robot.getDevice("frontGPS")
 lightsensor = robot.getDevice("light sensor")
 distancesensor = robot.getDevice("distance sensor")
 groundsensor = robot.getDevice("ground_ds")
+inertialunit = robot.getDevice("inertial unit")
 destinationCoordinates = [-0.4, -0.13]
 client = mqtt.Client()
 uuid = uuid.uuid4().hex
@@ -57,6 +58,7 @@ def initializeRobot():
     lightsensor.enable(TIME_STEP)
     distancesensor.enable(TIME_STEP)
     groundsensor.enable(TIME_STEP)
+    inertialunit.enable(TIME_STEP)
     motors[LEFT].setPosition(float('inf'))
     motors[RIGHT].setPosition(float('inf'))
     motorStop()
@@ -106,6 +108,7 @@ def getVectors(destination):
 
     vectors = [[(destination[0] - m_robotPos[0]), (destination[1] - m_robotPos[1])], \
     [(f_robotPos[0] - m_robotPos[0]), (f_robotPos[1] - m_robotPos[1])]] 
+    
     return vectors
     
     
@@ -143,20 +146,24 @@ def moveToTarget(destination):
     # don't exist in Python.
     
     condition = True
+    
     while(condition and not found_target and not obstacle):
         vectors = getVectors(destination)
         a, b = vectors[0][0], vectors[0][1]   
         length = abs(m.sqrt(m.pow(a, 2) + m.pow(b,2))) - POS_MARGIN
         motorMoveForward()
-        found_target = True if (lightsensor.getValue() > 500) else False
+        found_target = True if (lightsensor.getValue() > 450) else False
+        
         obstacle = True if (groundsensor.getValue() == 1000 or distancesensor.getValue() <= 400) else False 
         condition = (length > POS_MATCHING_ACC)  
     motorStop()
     if(found_target):
+        print("found")
         pass
         # Send MQTT data
         # found_target = False
     elif(obstacle):
+        print("obstacle")
         pass
         # Send MQTT data 
         # obstacle = False
@@ -183,16 +190,15 @@ def moveRobot(destination):
 def translateCoordinates(coordinates):
     return [(((coordinates[0])/100) - 1.67),\
     (((coordinates[1])/100 )-2.80)]
+    
 # MQTT functions
 def publishToServer(client, topic, message):
     global robotId
     client.publish(topic, message, 1)
-    print(str(robotId) + " publishing to: " + str(topic))
-    print(str(robotId) + " message: " + str(message))
+    print(str(robotId) + " publishing to: " + str(topic) + " message: " + str(message))
     
 def on_connect(client, userdata, flags, rc):
     print("Robot connected successfully, response code: " + str(rc)) 
-    
  
 def on_message(client, userdata, msg):
     global ACTION, robotId
@@ -201,13 +207,20 @@ def on_message(client, userdata, msg):
     payload = str(msg.payload.decode("utf-8"))
     print(action + " " + payload + " " + uuid)
     
-    if(action.__eq__("register")):
+    if(action.__eq__("update")):
+        publishToServer(client, "robots/toServer/" + robotId + "/position", 1)
+        publishToServer(client, "robots/toServer/" + robotId + "/heading", 0)
+    elif(action.__eq__("register")):
         robotId = payload
         client.unsubscribe("robots/toRobot/register/" + uuid)
         client.subscribe("robots/toRobot/" + robotId + "/#")
         publishToServer(client, "robots/toServer/" + robotId + "/state", "NO_TASK")
-        publishToServer(client, "robots/toServer" + robotId + "/model", "VIRTUAL")
-        publishToServer(client, "robots/toServer/" + robotId + "/begin", "true")
+        publishToServer(client, "robots/toServer/" + robotId + "/model", "VIRTUAL")
+        publishToServer(client, "robots/toServer/" + robotId + "/begin", "")
+        # Position given should be dynamicly obtained, not hardcoded. 
+        # Get x,y pos, check in which 
+        publishToServer(client, "robots/toServer/" + robotId + "/position", 1)
+     
         # The MQTT format changes after registration
         # so the topic index also has to change.
         
@@ -229,13 +242,28 @@ def initializeMQTTClient():
 
 if __name__ == "__main__":
     initializeRobot()
-    # initializeMQTTClient()
-    # while(robot.step(TIME_STEP) != -1):
-        # client.loop()
-        # robot.step(1)
-    moveRobot(translateCoordinates([0,399]))
+    #initializeMQTTClient()
+    while(robot.step(TIME_STEP) != -1):
+        #client.loop()
+        deg = inertialunit.getRollPitchYaw()[2] * 57.2957795
+        if(deg < 0):
+            deg = abs(deg)
+        elif(deg > 0):
+            deg = 360 - deg
+        print(deg)
+     
+        robot.step(1)
+           
+    #moveRobot(translateCoordinates([0,399]))
 
  
+ 
+     # TODO:
+         # GET HEADING ->CLOCKWISE
+         # CHANGE GRID ->
+             # hoegroot is een node
+             # hoe groot het grid word
+         # 13 x 11
         
 
 
