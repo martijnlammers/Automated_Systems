@@ -41,3 +41,24 @@ else:
     if tracker_type == "CSRT":
         tracker = cv2.TrackerCSRT_create()
 
+
+# Start of main code
+# TODO: put into functions
+grid = Grid()
+
+# Read video
+video = cv2.VideoCapture("C:\\Users\\rtsmo\\Downloads\\car-overhead-1_Slomo.mp4")
+
+# Exit if video not opened.
+if not video.isOpened():
+    print ("Could not open video")
+    sys.exit()
+
+# Read first frame.
+ok, frame = video.read()
+if not ok:
+    print ('Cannot read video file')
+    sys.exit()
+
+
+
