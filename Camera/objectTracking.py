@@ -71,3 +71,29 @@ bbox = cv2.selectROI(frame, False)
 # Initialize tracker with first frame and bounding box
 ok = tracker.init(frame, bbox)
 _, _, grid.width, grid.height = bbox
+
+def drawGrid():
+    gridY, gridX = (0,0)
+    xGridSize = yGridSize = 0
+    grid.frameHeight, grid.frameWidth, _ = frame.shape
+    xSizeKnown = False
+    gridCounter = 0
+
+    for gridY in range(grid.height, grid.frameHeight, grid.height):
+        for gridX in range(grid.width, grid.frameWidth, grid.width):
+            
+            cv2.rectangle(frame, (gridX- grid.width, gridY - grid.height), (gridX, gridY), (0,255,0), 2)
+            cv2.putText(frame, f"{gridCounter}", (int(gridX - (grid.width/1.2)), int(gridY - (grid.height/2))), cv2.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
+            gridX += grid.width
+            gridCounter += 1
+            if not xSizeKnown and not grid.gridDefined:
+                grid.xGridSize += 1
+        gridY += grid.height
+        xSizeKnown = True
+        
+        if not grid.gridDefined:
+            grid.yGridSize += 1
+    grid.gridDefined = True
+
+drawGrid()  #Always draw a grid to make sure it is initialized properly
+
