@@ -3,8 +3,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.47403401224966174 -0.011870706217912584 -0.8804265111662504 3.145256018948139
-  position 3.3012011235952134 -0.07764939939606702 5.697851084847439
+  orientation 0.3085690545099693 0.6942653061503565 -0.6502159820204172 1.1339239631294429
+  position -2.2450564948296883 1.1771980581725838 2.5046571475638832
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -14,188 +14,9 @@ TexturedBackground {
     0.2 0.2 0.2
   ]
 }
-Wall {
-  translation -2.25 1.35 0
-  name "wall(4)"
-}
-Wall {
-  translation -2.25 -0.45 0
-  name "wall(5)"
-}
-Wall {
-  translation -2.25 -2.985 0
-  name "wall(6)"
-  size 0.2 2.07 2.4
-}
-Wall {
-  translation -0.5 -3.92 0
-  name "wall(7)"
-  size 3.3 0.2 2.4
-}
-Door {
-  hidden translation_5 0.0010000008115729209 2.5458191110772077e-10 0
-  hidden rotation_5 0 0 1 0
-  translation -2.25 -1.45 0
-  position -1.3037321711106966e-08
-}
-SolidBox {
-  translation -2.146 0.455 0.03
-  rotation 0 0 1 1.5708
-  name "box(6)"
-  size 2.8 0.01 0.07
-  appearance PBRAppearance {
-    baseColor 0.8 0.8 0.8
-    roughness 0.5
-    metalness 0
-    textureTransform TextureTransform {
-      scale 1 8
-    }
-  }
-}
-SolidBox {
-  translation -2.145 -2.885 0.03
-  rotation 0 0 1 1.5708
-  name "box(7)"
-  size 1.87 0.01 0.07
-  appearance PBRAppearance {
-    baseColor 0.8 0.8 0.8
-    roughness 0.5
-    metalness 0
-    textureTransform TextureTransform {
-      scale 1 8
-    }
-  }
-}
-SolidBox {
-  translation -0.495 -3.815 0.03
-  rotation 0 0 1 3.14159
-  size 3.29 0.01 0.07
-  appearance PBRAppearance {
-    baseColor 0.8 0.8 0.8
-    roughness 0.5
-    metalness 0
-    textureTransform TextureTransform {
-      scale 1 8
-    }
-  }
-}
-Window {
-  translation -2.25 0.45 0
-  rotation 0 0 1 3.14159
-  name "window(1)"
-  bottomWallHeight 0.9
-  windowHeight 1
-  windowSillSize 0.01 0.05
-}
-Floor {
-  translation 0.8 -0.8 0.01
-  name "floor(1)"
-  size 0.04 4
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -1.35 0 0.01
-  rotation 0 0 1 1.57079633
-  name "floor(5)"
-  size 0.04 0.7
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -0.66 -2.078 0.01
-  rotation 0 0 1 1.57079633
-  name "floor(7)"
-  size 0.04 0.7
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation 0.45 -1.5 0.01
-  rotation 0 0 1 1.57079633
-  name "floor(9)"
-  size 0.04 0.7
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -0.3 0.81 0.01
-  name "floor(11)"
-  size 0.04 0.7
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation 0.03 0.45 0.01
-  rotation 0 0 1 1.57079633
-  name "floor(10)"
-  size 0.04 0.7
-  tileSize 0.5 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -1.025 -1.05 0.01
-  name "floor(8)"
-  size 0.04 2.1
-  tileSize 1 1
-  appearance Parquetry {
-    type "light strip"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -0.4 -0.6 0.01
-  name "floor(12)"
-  size 0.04 1
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -0.1 -0.6 0.01
-  rotation 0 0 1 1.5707996938995747
-  name "floor(13)"
-  size 0.04 0.6
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -0.45 1.175 0.01
-  rotation 0 0 1 1.57079633
-  name "floor(3)"
-  size 0.04 2.5
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
 Robot {
-  translation 0.0178891162473087 -2.039431219071449 0.039983908129106245
-  rotation 0.0009551929172799766 -0.0011627837736800342 0.9999988677695523 0.27142326624590934
+  translation 0 0 0.0400175
+  rotation 0.0005682018489465946 -0.002102699091703375 0.9999976278987808 0.16321838505584121
   children [
     InertialUnit {
       rotation 0 0 1 -1.5707953071795862
@@ -341,19 +162,19 @@ Robot {
     }
     BallJoint {
       jointParameters BallJointParameters {
-        position -57.36287324626265
+        position -58.952263509217225
         anchor 0 0.06 -0.02
       }
       jointParameters2 JointParameters {
-        position -176.85470667327127
+        position -175.93954386933706
       }
       jointParameters3 JointParameters {
-        position -238.77547970855204
+        position -330.18324998914346
         axis 0 1 0
       }
       endPoint Solid {
-        translation 4.3297232787953277e-07 0.0600002570968412 -0.019999972619880253
-        rotation -0.7975096493263274 0.5995210754815898 0.06747473071303074 -2.879058603070047
+        translation 1.6914501244926544e-07 0.05999978991777514 -0.020000426109043484
+        rotation 0.5096190474839262 0.24665385635200143 0.824287754117615 1.2493139881435917
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -366,8 +187,6 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
-        linearVelocity 5.490760454225437e-08 -2.2679694174203586e-08 4.0771302018488405e-08
-        angularVelocity 2.2685769624579867e-06 5.490171654449526e-06 -0.0004535930844681575
       }
     }
     Solid {
@@ -387,7 +206,7 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 15.9353554137414
+        position 15.936312453227746
         anchor 0.057 -0.04 0
       }
       device [
@@ -397,8 +216,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.057 -0.04000396132139594 2.592139196231247e-06
-        rotation 0.6161055866294557 -0.4913593221434953 -0.6156134523113178 2.2275374271656903
+        translation 0.057 -0.040003963800360996 2.5883468687105705e-06
+        rotation 0.6162515026730331 -0.4909935124943675 -0.6157592517710733 2.228127134375602
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -415,13 +234,11 @@ Robot {
         boundingObject USE wheel_left
         physics DEF Physics_wh Physics {
         }
-        linearVelocity -1.1288448536678323e-07 -2.915007342966758e-09 2.6973418954141412e-08
-        angularVelocity -9.001683524791086e-07 2.03915349588624e-06 4.8822383104061285e-08
       }
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position -15.036021604697911
+        position -15.036021600965643
         anchor -0.057 -0.04 0
       }
       device [
@@ -431,8 +248,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.057 -0.04002314207948371 4.2532628322020876e-05
-        rotation 0.6696573070358735 -0.32223329166784415 -0.669122407990024 2.5176708002649226
+        translation -0.057 -0.04002314207964245 4.253262823565168e-05
+        rotation 0.6696573073678079 -0.3222332902893096 -0.6691224083216933 2.517670802764263
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -449,8 +266,6 @@ Robot {
         boundingObject USE wheel_right
         physics DEF Physics_wh Physics {
         }
-        linearVelocity 2.2476404054818824e-07 7.216918918904776e-08 6.193885925290044e-08
-        angularVelocity -3.989828401509578e-07 2.398900543176853e-07 1.5369616329870899e-07
       }
     }
     DEF Body1 Shape {
@@ -467,36 +282,8 @@ Robot {
   }
   controller "pyController"
 }
-Floor {
-  translation -0.45 -2.78 0.01
-  rotation 0 0 1 1.57079633
-  name "floor(4)"
-  size 0.04 2.5
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -1.7 -0.8 0.01
-  name "floor(2)"
-  size 0.04 4
-  tileSize 1 1
-  appearance Parquetry {
-    type "chequered"
-    colorOverride 0 0 0
-  }
-}
-Floor {
-  translation -0.6 -1.05 0
-  size 3.5 5.8
-  appearance Parquetry {
-    type "light strip"
-  }
-}
 Robot {
-  translation -0.51 -1.14 0.06
+  translation -1.33 -0.62 0.06
   children [
     PointLight {
       attenuation 0 0 1
@@ -518,4 +305,86 @@ Robot {
     }
   ]
   name "target"
+}
+Floor {
+  translation -0.9 -0.9 0
+  name "floor(1)"
+  size 2.4 2.4
+  tileSize 0.2 0.2
+}
+Floor {
+  translation -0.9 0.2 0.01
+  name "floor(2)"
+  size 2.4 0.2
+  tileSize 0.2 0.2
+  appearance NULL
+}
+Floor {
+  translation -0.9 0.5 0.01
+  name "floor(6)"
+  size 2.4 0.2
+  tileSize 0.2 0.2
+  appearance Parquetry {
+    colorOverride 0 0 0
+  }
+}
+Floor {
+  translation -0.2 -0.4 0.01
+  name "floor(7)"
+  size 0.6 0.2
+  tileSize 0.2 0.2
+  appearance Parquetry {
+    colorOverride 0 0 0
+  }
+}
+Floor {
+  translation -1 -0.5 0.01
+  rotation 0 0 1 1.5708
+  name "floor(9)"
+  size 1.2 0.2
+  tileSize 0.2 0.2
+  appearance Parquetry {
+    colorOverride 0 0 0
+  }
+}
+Floor {
+  translation -0.2 -1.2 0.01
+  name "floor(8)"
+  size 0.6 0.2
+  tileSize 0.2 0.2
+  appearance Parquetry {
+    colorOverride 0 0 0
+  }
+}
+Floor {
+  translation -1.6 -1.4 0.01
+  name "floor(10)"
+  size 0.6 0.2
+  tileSize 0.2 0.2
+  appearance Parquetry {
+    colorOverride 0 0 0
+  }
+}
+Floor {
+  translation -2 -0.9 0.01
+  rotation 0 0 1 -1.5708
+  name "floor(4)"
+  size 2 0.2
+  tileSize 0.2 0.2
+  appearance NULL
+}
+Floor {
+  translation 0.2 -0.9 0.01
+  rotation 0 0 1 -1.5708
+  name "floor(5)"
+  size 2 0.2
+  tileSize 0.2 0.2
+  appearance NULL
+}
+Floor {
+  translation -0.9 -2 0.01
+  name "floor(3)"
+  size 2.4 0.2
+  tileSize 0.2 0.2
+  appearance NULL
 }

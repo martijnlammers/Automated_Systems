@@ -110,8 +110,10 @@ def getVectors(destination):
     [(f_robotPos[0] - m_robotPos[0]), (f_robotPos[1] - m_robotPos[1])]] 
     
     return vectors
-    
-    
+
+def getHeading():
+    deg = inertialunit.getRollPitchYaw()[2] * 57.2957795
+    return abs(deg) if (deg < 0) else 360 - deg
  
 def rotateToTarget(destination):
     initialAngle = calculateAngleToTarget(getVectors(destination));
@@ -245,13 +247,9 @@ if __name__ == "__main__":
     #initializeMQTTClient()
     while(robot.step(TIME_STEP) != -1):
         #client.loop()
-        deg = inertialunit.getRollPitchYaw()[2] * 57.2957795
-        if(deg < 0):
-            deg = abs(deg)
-        elif(deg > 0):
-            deg = 360 - deg
-        print(deg)
-     
+        
+        # print(deg)
+        print(getHeading())
         robot.step(1)
            
     #moveRobot(translateCoordinates([0,399]))
