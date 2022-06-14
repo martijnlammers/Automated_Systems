@@ -1,10 +1,11 @@
 #VRML_SIM R2022a utf8
 WorldInfo {
+  basicTimeStep 20
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.3085690545099693 0.6942653061503565 -0.6502159820204172 1.1339239631294429
-  position -2.2450564948296883 1.1771980581725838 2.5046571475638832
+  orientation -0.607553261645754 0.16310903902569457 0.777350934682477 2.761557934586135
+  position 1.6170791769595536 0.05997528210924241 4.262198366996803
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -15,8 +16,8 @@ TexturedBackground {
   ]
 }
 Robot {
-  translation 0 0 0.0400175
-  rotation 0.0005682018489465946 -0.002102699091703375 0.9999976278987808 0.16321838505584121
+  translation 0.69299 0.00126199 0.0401345
+  rotation -0.00015023299813099776 4.8077299401885195e-05 0.9999999875593096 -1.506305307179586
   children [
     InertialUnit {
       rotation 0 0 1 -1.5707953071795862
@@ -162,19 +163,19 @@ Robot {
     }
     BallJoint {
       jointParameters BallJointParameters {
-        position -58.952263509217225
+        position -62.45275292447171
         anchor 0 0.06 -0.02
       }
       jointParameters2 JointParameters {
-        position -175.93954386933706
+        position -183.0077780781426
       }
       jointParameters3 JointParameters {
-        position -330.18324998914346
+        position -347.00844401753324
         axis 0 1 0
       }
       endPoint Solid {
-        translation 1.6914501244926544e-07 0.05999978991777514 -0.020000426109043484
-        rotation 0.5096190474839262 0.24665385635200143 0.824287754117615 1.2493139881435917
+        translation -4.761347877387496e-07 0.060000147877886496 -0.02000007577128737
+        rotation -0.7997287030128453 -0.3961396206215434 -0.4511179474940139 2.9070824880522457
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -206,8 +207,8 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 15.936312453227746
-        anchor 0.057 -0.04 0
+        position 69.40070965496857
+        anchor 0.058 -0.04 0
       }
       device [
         DEF wheel_left RotationalMotor {
@@ -216,8 +217,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.057 -0.040003963800360996 2.5883468687105705e-06
-        rotation 0.6162515026730331 -0.4909935124943675 -0.6157592517710733 2.228127134375602
+        translation 0.058 -0.0399959 -2.3570099999965233e-06
+        rotation 0.5152913843673587 0.6851085094955616 -0.5148797135385517 4.343661145301338
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -238,8 +239,8 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position -15.036021600965643
-        anchor -0.057 -0.04 0
+        position 1.4509276606581587
+        anchor -0.058 -0.04 0
       }
       device [
         DEF wheel_right RotationalMotor {
@@ -248,8 +249,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.057 -0.04002314207964245 4.253262823565168e-05
-        rotation 0.6696573073678079 -0.3222332902893096 -0.6691224083216933 2.517670802764263
+        translation -0.058 -0.0399536 -1.4008699999997208e-05
+        rotation 0.059215745484079436 0.9964901443294527 -0.059168300136400176 4.709672098666368
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -283,7 +284,7 @@ Robot {
   controller "pyController"
 }
 Robot {
-  translation -1.33 -0.62 0.06
+  translation -0.07 0.63 0.06
   children [
     PointLight {
       attenuation 0 0 1
@@ -307,20 +308,23 @@ Robot {
   name "target"
 }
 Floor {
-  translation -0.9 -0.9 0
+  translation 0.8 0.9 0
   name "floor(1)"
   size 2.4 2.4
   tileSize 0.2 0.2
+  appearance Parquetry {
+    type "light strip"
+  }
 }
 Floor {
-  translation -0.9 0.2 0.01
+  translation 0.8 2 0.01
   name "floor(2)"
   size 2.4 0.2
   tileSize 0.2 0.2
   appearance NULL
 }
 Floor {
-  translation -0.9 0.5 0.01
+  translation 0.8 2.5 0.01
   name "floor(6)"
   size 2.4 0.2
   tileSize 0.2 0.2
@@ -329,7 +333,7 @@ Floor {
   }
 }
 Floor {
-  translation -0.2 -0.4 0.01
+  translation 0.1 0.4 2e-05
   name "floor(7)"
   size 0.6 0.2
   tileSize 0.2 0.2
@@ -338,7 +342,7 @@ Floor {
   }
 }
 Floor {
-  translation -1 -0.5 0.01
+  translation 0.9 0.5 2e-05
   rotation 0 0 1 1.5708
   name "floor(9)"
   size 1.2 0.2
@@ -348,7 +352,7 @@ Floor {
   }
 }
 Floor {
-  translation -0.2 -1.2 0.01
+  translation 0.1 1.2 2e-05
   name "floor(8)"
   size 0.6 0.2
   tileSize 0.2 0.2
@@ -357,7 +361,7 @@ Floor {
   }
 }
 Floor {
-  translation -1.6 -1.4 0.01
+  translation 1.5 1.4 2e-05
   name "floor(10)"
   size 0.6 0.2
   tileSize 0.2 0.2
@@ -366,7 +370,7 @@ Floor {
   }
 }
 Floor {
-  translation -2 -0.9 0.01
+  translation -0.3 0.9 0.01
   rotation 0 0 1 -1.5708
   name "floor(4)"
   size 2 0.2
@@ -374,7 +378,7 @@ Floor {
   appearance NULL
 }
 Floor {
-  translation 0.2 -0.9 0.01
+  translation 1.9 0.9 0.01
   rotation 0 0 1 -1.5708
   name "floor(5)"
   size 2 0.2
@@ -382,7 +386,7 @@ Floor {
   appearance NULL
 }
 Floor {
-  translation -0.9 -2 0.01
+  translation 0.8 -0.2 0.01
   name "floor(3)"
   size 2.4 0.2
   tileSize 0.2 0.2

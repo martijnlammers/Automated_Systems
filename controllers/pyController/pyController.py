@@ -23,14 +23,14 @@ USERNAME = "robots"
 PASSWORD = "robots"
 TIME_STEP = 32
 ROTATE_SPEED = 0.07
-MAX_SPEED = 8
+MAX_SPEED = 5
 LEFT = 0
 RIGHT = 1
 NUM_MOTORS = 2
 ACTION = 2
-POS_MARGIN = 0.1
-POS_MATCHING_ACC = 0.07
-ANGLE_ACCURACY = 0.000000001
+POS_MARGIN = 0.0
+POS_MATCHING_ACC = 0.03
+ANGLE_ACCURACY = 0.2
 
 # Global variables.
 robot = Robot()
@@ -113,7 +113,21 @@ def getVectors(destination):
 
 def getHeading():
     deg = inertialunit.getRollPitchYaw()[2] * 57.2957795
-    return abs(deg) if (deg < 0) else 360 - deg
+    deg = abs(deg) if (deg < 0) else 360 - deg
+    heading = None
+    
+    # The algorithm on the server can only use 
+    # 0, 90, 180 and 270 to do it's calculations with.
+    
+    if(deg > 315 or deg <= 45):
+        heading = 180
+    elif(deg > 45 and deg <= 135):
+        heading = 270
+    elif(deg > 135 and deg <= 225):
+        heading = 0
+    elif(deg > 225 and deg <= 315):
+        heading = 90
+    return heading
  
 def rotateToTarget(destination):
     initialAngle = calculateAngleToTarget(getVectors(destination));
@@ -152,12 +166,15 @@ def moveToTarget(destination):
     while(condition and not found_target and not obstacle):
         vectors = getVectors(destination)
         a, b = vectors[0][0], vectors[0][1]   
-        length = abs(m.sqrt(m.pow(a, 2) + m.pow(b,2))) - POS_MARGIN
+        length = abs(m.sqrt(m.pow(a, 2) + m.pow(b,2))) + POS_MARGIN
+        
+        print(length)
         motorMoveForward()
         found_target = True if (lightsensor.getValue() > 450) else False
         
         obstacle = True if (groundsensor.getValue() == 1000 or distancesensor.getValue() <= 400) else False 
         condition = (length > POS_MATCHING_ACC)  
+        
     motorStop()
     if(found_target):
         print("found")
@@ -172,8 +189,10 @@ def moveToTarget(destination):
     return
 
 
-def moveRobot(destination):
+def moveRobot(node_number):
      robot.step(1)
+     destination = translateToCoordinates(node_number)
+     print(destination)
      m_robotPos = m_gps.getValues()
      
      # Quits function when the destination equals the current position.
@@ -189,9 +208,10 @@ def moveRobot(destination):
      rotateToTarget(destination)
      moveToTarget(destination)
 
-def translateCoordinates(coordinates):
-    return [(((coordinates[0])/100) - 1.67),\
-    (((coordinates[1])/100 )-2.80)]
+def translateToCoordinates(node_nr):
+    x_mp = int(node_nr / 10)
+    y_mp = node_nr % 10
+    return [(x_mp * 0.2) - 0.068, (y_mp * 0.2) - 0.00553]
     
 # MQTT functions
 def publishToServer(client, topic, message):
@@ -247,20 +267,19 @@ if __name__ == "__main__":
     #initializeMQTTClient()
     while(robot.step(TIME_STEP) != -1):
         #client.loop()
-        
-        # print(deg)
         print(getHeading())
         robot.step(1)
-           
-    #moveRobot(translateCoordinates([0,399]))
-
- 
+    # moveRobot(0)
+    # moveRobot(1)
+    # moveRobot(31)
+    # moveRobot(33)
+    # moveRobot(3)  
  
      # TODO:
          # GET HEADING ->CLOCKWISE
          # CHANGE GRID ->
-             # hoegroot is een node
-             # hoe groot het grid word
+             # hoegroot is een node -> 20x20units
+             # hoe groot het grid word -> 10x10 nodes
          # 13 x 11
         
 
