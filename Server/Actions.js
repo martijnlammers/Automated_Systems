@@ -1,6 +1,7 @@
 const communication = require("./Communication");
 const robotLib = require("./Robot");
-const algorithms = require("./Controller")
+const algorithms = require("./Controller");
+const munkres = require("munkres-js")
 
 // CHECK VARIABLE AND FUNCTION NAMES
 function getVerticesAroundLocation(location) {
@@ -51,7 +52,7 @@ function getRobotPositions() {
     var robotPositions = [];
 
     for (robotIndex in robotLib.robots) {
-        startVertexVector.push(robotLib.robots[robotIndex].position);
+        robotPositions.push(robotLib.robots[robotIndex].position);
     }
 
     return robotPositions;
@@ -59,7 +60,7 @@ function getRobotPositions() {
 
 function updatePaths(targetSet) {
     var startVertexVector = getRobotPositions();
-    var pathAndAssingment = algorithms.getPathAndAssignment(algorithms.adjacencyMatrix, robotLib.robots.length, rows * columns, startVertexVector, targetSet);
+    var pathAndAssingment = algorithms.getPathAndAssignment(algorithms.adjacencyMatrix, algorithms.rows * algorithms.columns, startVertexVector, targetSet);
     var shortestPathMatrixRow, shortestPathMatrixColumn;
 
     optimalAssignment = munkres(pathAndAssingment[1]);
@@ -121,6 +122,7 @@ function goalDetected(robot) {
 }
 
 function registerRobot(topicArray) {
+    if(robotLib.robotCounter >= robotLib.NUM_OF_ROBOTS) return;
     newRobot = robotLib.addRobot(`robot${robotLib.robotCounter++}`);
     topicArray[1] = "toRobot";
     console.log(topicArray);
@@ -129,23 +131,40 @@ function registerRobot(topicArray) {
 }
 
 function rotateAck(){
-  console.log("rotate bot stopped");
-}
+    console.log("rotate bot stopped");
 
-function begin(){
-    if(!(robotLib.robotCounter === 1)) return;
-    robotLib.robots.forEach((robot)=>{
-        
-        communication.updateInformation(robot.robotID, robot.model);
-    })
+function begin(robot){
+    let begin_flag = false;
 
-    console.log(robotLib.robots.pop());
-    //1 Get robot position (pos?)
-    //2 
-    //2 Get new position for each robot -> Pathfinding algo?
-    //3 Assign new positions to robots
-    //4 If found, stop assigning positions
-    //5 Direct other robots to target found location
+    if((robotLib.robotCounter === robotLib.NUM_OF_ROBOTS) && 
+    robotLib.robots[(robotLib.robots.length)-1].robotID === robot.robotID){
+        begin_flag = true;
+    }
+    if(!begin_flag) return;
+    // communication.publishMessage(`robots/toRobot/${robot.robotID}/setPos`, `${0}`);
+    // communication.publishMessage(`robots/toRobot/${robot.robotID}/rotateDegrees`, `${270}`);
+    var numberOfTargetSets = Math.round((algorithms.rows / robotLib.robotCounter) * 2);
+    algorithms.targetSetMatrix = algorithms.createTargetSets(numberOfTargetSets);
+    var startVertexVector = getRobotPositions();
+    var numberOfVertices = algorithms.rows * algorithms.columns;
+    var pathAndAssignment = algorithms.getPathAndAssignment(algorithms.adjacencyMatrix, numberOfVertices, startVertexVector, algorithms.targetSetMatrix[robotLib.targetSetIndex]);
+    var optimalAssignments = munkres(pathAndAssignment[1]);
+
+    for (assignmentIndex in optimalAssignments) {
+        currentOptimalAssingment = optimalAssignments[assignmentIndex];
+        robotLib.robots[assignmentIndex].path = pathAndAssignment[0][currentOptimalAssingment[0]][currentOptimalAssingment[1]];
+    }
+
+    robotLib.robots.forEach((currentRobot) => {
+        if (currentRobot.path.length === 0) return;
+        communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/setPath`, `${currentRobot.path}`);
+    });
+
+    // To do:
+    // Task assignment to robots
+    // while(not_found)
+    //      Grid search
+
 }
 
 module.exports = {getVerticesAroundLocation, shiftArray, getObstacleLocations, getRobotPositions, updatePaths, 
