@@ -1,5 +1,7 @@
 var robots = [];
-var robotCounter = 3;
+var robotCounter = 0;
+var targetSetIndex = 0;
+const NUM_OF_ROBOTS = 1; // Can not be bigger than algorithm.rows
 
 class Robot {
     constructor(robotID){
@@ -8,7 +10,6 @@ class Robot {
       this.positionReached = true;
       this.path = [];
       this.pathIndex = 0;
-      this.targetSetIndex = 0;
       this.model = "PHYSICAL";
       this.heading = 0;
       this.state = "NO_TASK";
@@ -27,5 +28,5 @@ function removeRobot(robotID){
     robots = robots.filter(robot => robot.robotID !== robotID);
 }
 
-module.exports = { robots, robotCounter, Robot, addRobot, removeRobot };
+module.exports = { robots, robotCounter, Robot, addRobot, removeRobot, NUM_OF_ROBOTS, targetSetIndex};
 
