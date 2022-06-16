@@ -132,6 +132,7 @@ function registerRobot(topicArray) {
 
 function rotateAck(){
     console.log("rotate bot stopped");
+}
 
 function begin(robot){
     let begin_flag = false;
