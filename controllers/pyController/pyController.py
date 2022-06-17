@@ -19,7 +19,7 @@ HOST, PORT = "145.24.222.37", 8005
 USERNAME, PASSWORD = "robots", "robots"
 
 TIME_STEP = 20
-ROTATE_SPEED, MAX_SPEED = 1, 5
+ROTATE_SPEED, MAX_SPEED = 1, 4
 POS_CORRECTION = 3
 POS_MATCHING_ACC = 0.03
 ANGLE_ACCURACY = 1
@@ -76,8 +76,8 @@ def motorRotateLeft():
 
 
 def motorRotateRight():
-    motor_left.setVelocity(ROTATE_SPEED)
-    motor_right.setVelocity(-ROTATE_SPEED)
+    motor_left.setVelocity(-ROTATE_SPEED)
+    motor_right.setVelocity(ROTATE_SPEED)
     r.step(TIME_STEP)
 
 # Math source: https://www.cuemath.com/geometry/angle-between-vectors/
@@ -149,7 +149,6 @@ def rotateToTarget(destination):
         motorRotateLeft()
         while(calculateAngleToTarget(getVectors(destination)) > ANGLE_ACCURACY):
             r.step(TIME_STEP)
-       
     else:
         motorRotateRight()
         while(calculateAngleToTarget(getVectors(destination)) > ANGLE_ACCURACY):
@@ -282,9 +281,11 @@ def initializeMQTTClient():
 
 if __name__ == "__main__":
     initializeRobot()
-    initializeMQTTClient()
-    while(r.step(TIME_STEP) != -1):
-        client.loop()
-        if(len(path) > 0):
-            moveRobot(path.pop(0))
-            r.step(TIME_STEP)
+    # initializeMQTTClient()
+    # while(r.step(TIME_STEP) != -1):
+        # client.loop()
+        # if(len(path) > 0):
+            # moveRobot(path.pop(0))
+            # r.step(TIME_STEP)\
+    moveRobot(0)
+    moveRobot(1)

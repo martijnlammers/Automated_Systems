@@ -5,8 +5,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation -0.4235961322328174 0.5270697760174087 0.7367250287362009 1.7020335305840937
-  position 0.203595361908171 -0.5996220004105471 1.0939720979506502
+  orientation 0.3817143070340118 -0.6101117338842222 -0.6943038671808853 4.629699803926887
+  position 0.020008657632441487 -0.5822413627939342 0.8994819039357081
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -17,8 +17,8 @@ TexturedBackground {
   ]
 }
 Robot {
-  translation 0.318904 -0.00361773 0.0400889
-  rotation -8.371734051934042e-05 -0.0002076749456157544 -0.9999999749312615 1.5764520820509278
+  translation 0.291139 -0.00289643 0.0400624
+  rotation 0.0002694767081947588 1.0285413399530637e-05 -0.9999999636382565 1.5846374780430053
   children [
     InertialUnit {
       rotation 0 0 1 -1.5707953071795862
@@ -60,10 +60,11 @@ Robot {
       numberOfRays 37
     }
     DistanceSensor {
-      translation 1.12124e-13 -0.07 -0.00270004
+      translation 1.23017e-07 -0.1 -0.00269998
       rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 2.09439
       children [
         Solid {
+          translation 0 0 -0.06
           children [
             Shape {
               appearance PBRAppearance {
@@ -84,7 +85,7 @@ Robot {
       rotation 0 0 1 -1.5707953071795862
       children [
         Solid {
-          translation 0 -0.02 0
+          translation -0.01 -0.02 0
           children [
             Shape {
               appearance PBRAppearance {
@@ -120,7 +121,7 @@ Robot {
       translation 0 -0.07 0
       children [
         Solid {
-          translation 0 0 0.01
+          translation 2.65359e-08 0.01 0.01
           rotation 0 0 1 3.14159
           children [
             Shape {
@@ -143,7 +144,7 @@ Robot {
           appearance PBRAppearance {
           }
           geometry Box {
-            size 0.11 0.15 0.003125
+            size 0.11 0.13 0.003125
           }
         }
       ]
@@ -158,7 +159,7 @@ Robot {
             baseColor 0.666667 0 1
           }
           geometry Box {
-            size 0.11 0.15 0.003125
+            size 0.11 0.13 0.003125
           }
         }
       ]
@@ -166,19 +167,19 @@ Robot {
     }
     BallJoint {
       jointParameters BallJointParameters {
-        position -45.757104165210556
+        position -43.11193187535873
         anchor 0 0.06 -0.02
       }
       jointParameters2 JointParameters {
-        position -146.26010972802024
+        position -144.23317930803134
       }
       jointParameters3 JointParameters {
-        position -352.57016283865806
+        position -360.4690652556564
         axis 0 1 0
       }
       endPoint Solid {
-        translation 1.8004497646197295e-07 0.06000069336898615 -0.020000221429270142
-        rotation -0.42411770573260166 -0.30060474051288466 0.8542604764738304 3.0826866594688007
+        translation 6.693537512954937e-07 0.059999947847937087 -0.019999509051121443
+        rotation -0.8093464070487966 -0.5307162786590629 -0.25159217985358673 4.317263579852344
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -191,6 +192,19 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
+      }
+    }
+    BallJoint {
+      jointParameters BallJointParameters {
+        position -41.01351771477373
+        anchor 0 -0.06 -0.02
+      }
+      jointParameters2 JointParameters {
+        position -144.76811684986995
+      }
+      jointParameters3 JointParameters {
+        position -383.2551587140965
+        axis 0 1 0
       }
     }
     Solid {
@@ -210,8 +224,8 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 92.55583339181582
-        anchor 0.058 -0.04 0
+        position 127.19608745541338
+        anchor 0.058 7.41444e-06 5.47319e-05
       }
       device [
         DEF wheel_left RotationalMotor {
@@ -220,8 +234,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.05799999806603301 -0.0400037569204259 -2.6898600096864757e-06
-        rotation -0.7063239905317467 0.054859576541899484 0.7057597659692372 3.251289506775691
+        translation 0.058 5.8347e-05 -2.6015700000000104e-06
+        rotation 0.036205167124076044 0.9986893767263212 -0.03617616186813426 4.711876638565324
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -242,8 +256,8 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 21.295803921627737
-        anchor -0.058 -0.04 0
+        position 55.988264093667986
+        anchor -0.058 -3.68501e-05 5.42871e-05
       }
       device [
         DEF wheel_right RotationalMotor {
@@ -252,8 +266,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.05800000009486852 -0.03996328128309855 3.1278430698746024e-05
-        rotation 0.3909754054796429 -0.8333789631616066 -0.39066320030137763 1.751276062565449
+        translation -0.058 6.150729999999963e-06 -3.6725799999999946e-05
+        rotation -0.6587070619746317 -0.364558670249786 0.6581808128853776 2.441907632865235
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -277,7 +291,7 @@ Robot {
         baseColor 1 0.666667 1
       }
       geometry Box {
-        size 0.11 0.15 0.003125
+        size 0.11 0.13 0.003125
       }
     }
   ]
@@ -289,8 +303,8 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation 0.309941 0.176974 0.030021
-  rotation -8.371734051934042e-05 -0.0002076749456157544 -0.9999999749312615 1.5764520820509278
+  translation 0.313661 0.17822 0.0400952
+  rotation 0.0002694767081947588 1.0285413399530637e-05 -0.9999999636382565 1.5846374780430053
   children [
     InertialUnit {
       rotation 0 0 1 -1.5707953071795862
@@ -332,10 +346,11 @@ Robot {
       numberOfRays 37
     }
     DistanceSensor {
-      translation 1.12124e-13 -0.07 -0.00270004
+      translation 1.23017e-07 -0.1 -0.00269998
       rotation 0.577349935856137 0.5773509358560258 -0.577349935856137 2.09439
       children [
         Solid {
+          translation 0 0 -0.06
           children [
             Shape {
               appearance PBRAppearance {
@@ -356,7 +371,7 @@ Robot {
       rotation 0 0 1 -1.5707953071795862
       children [
         Solid {
-          translation 0 -0.02 0
+          translation -0.01 -0.02 0
           children [
             Shape {
               appearance PBRAppearance {
@@ -392,7 +407,7 @@ Robot {
       translation 0 -0.07 0
       children [
         Solid {
-          translation 0 0 0.01
+          translation 2.65359e-08 0.01 0.01
           rotation 0 0 1 3.14159
           children [
             Shape {
@@ -415,7 +430,7 @@ Robot {
           appearance PBRAppearance {
           }
           geometry Box {
-            size 0.11 0.15 0.003125
+            size 0.11 0.13 0.003125
           }
         }
       ]
@@ -430,7 +445,7 @@ Robot {
             baseColor 0.666667 0 1
           }
           geometry Box {
-            size 0.11 0.15 0.003125
+            size 0.11 0.13 0.003125
           }
         }
       ]
@@ -438,19 +453,19 @@ Robot {
     }
     BallJoint {
       jointParameters BallJointParameters {
-        position -45.757104165210556
+        position -43.11193187535873
         anchor 0 0.06 -0.02
       }
       jointParameters2 JointParameters {
-        position -146.26010972802024
+        position -144.23317930803134
       }
       jointParameters3 JointParameters {
-        position -352.57016283865806
+        position -360.4690652556564
         axis 0 1 0
       }
       endPoint Solid {
-        translation 1.8004497646197295e-07 0.06000069336898615 -0.020000221429270142
-        rotation -0.42411770573260166 -0.30060474051288466 0.8542604764738304 3.0826866594688007
+        translation 6.693537512954937e-07 0.059999947847937087 -0.019999509051121443
+        rotation -0.8093464070487966 -0.5307162786590629 -0.25159217985358673 4.317263579852344
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -463,6 +478,19 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
+      }
+    }
+    BallJoint {
+      jointParameters BallJointParameters {
+        position -41.01351771477373
+        anchor 0 -0.06 -0.02
+      }
+      jointParameters2 JointParameters {
+        position -144.76811684986995
+      }
+      jointParameters3 JointParameters {
+        position -383.2551587140965
+        axis 0 1 0
       }
     }
     Solid {
@@ -482,8 +510,8 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 92.55583339181582
-        anchor 0.058 -0.04 0
+        position 127.19608745541338
+        anchor 0.058 7.41444e-06 5.47319e-05
       }
       device [
         DEF wheel_left RotationalMotor {
@@ -492,8 +520,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.05799999806603301 -0.0400037569204259 -2.6898600096864757e-06
-        rotation -0.7063239905317467 0.054859576541899484 0.7057597659692372 3.251289506775691
+        translation 0.058 5.8347e-05 -2.6015700000000104e-06
+        rotation 0.036205167124076044 0.9986893767263212 -0.03617616186813426 4.711876638565324
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -514,8 +542,8 @@ Robot {
     }
     HingeJoint {
       jointParameters HingeJointParameters {
-        position 21.295803921627737
-        anchor -0.058 -0.04 0
+        position 55.988264093667986
+        anchor -0.058 -3.68501e-05 5.42871e-05
       }
       device [
         DEF wheel_right RotationalMotor {
@@ -524,8 +552,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.05800000009486852 -0.03996328128309855 3.1278430698746024e-05
-        rotation 0.3909754054796429 -0.8333789631616066 -0.39066320030137763 1.751276062565449
+        translation -0.058 6.150729999999963e-06 -3.6725799999999946e-05
+        rotation -0.6587070619746317 -0.364558670249786 0.6581808128853776 2.441907632865235
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -549,7 +577,7 @@ Robot {
         baseColor 1 0.666667 1
       }
       geometry Box {
-        size 0.11 0.15 0.003125
+        size 0.11 0.13 0.003125
       }
     }
   ]

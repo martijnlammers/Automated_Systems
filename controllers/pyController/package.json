@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "dijkstra-calculator": "^1.0.8",
+    "pathfinding": "^0.4.18"
+  }
+}
