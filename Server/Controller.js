@@ -1,8 +1,8 @@
 var munkres = require('munkres-js');
 var robotLib = require("./Robot");
 
-const rows = 3;
-const columns = 3;
+const rows = 10;
+const columns = 10;
 
 function createFirstTargetSet() {
     var firstTargetSet = [];
@@ -23,6 +23,7 @@ function createFirstTargetSet() {
 };
 
 function createTargetSets(numberOfTargetSets) {
+    targetSetMatrix = makeEmpty2DArray(numberOfTargetSets)
     var targetSetPattern = [rows-1, robotLib.robotCounter * rows, -(rows - 1), robotLib.robotCounter * rows];
     var firstTargetSet = createFirstTargetSet();
     var targetSetMatrix = makeEmpty2DArray(numberOfTargetSets);
@@ -45,7 +46,6 @@ function createAdjacencyMatrix() {
     var numberOfVertices = rows * columns;
     var index, rightCel, leftCel, celUp, celDown;
     var adjacencyMatrix = new Array(numberOfVertices).fill(0).map(function () { return new Array(numberOfVertices).fill(0); });
-
     for (var currentRow = 0; currentRow < rows; currentRow++) {
         for (var currentColumn = 0; currentColumn < columns; currentColumn++) {
             index = currentRow * columns + currentColumn;
@@ -121,9 +121,7 @@ function breadthFirstSearch(adjacencyMatrix, startVertex, numberOfVertices) {
     var previous = makeEmpty2DArray(numberOfVertices);
     var visited = new Array(numberOfVertices).fill(false);
     var queue = [startVertex];
-
     visited[startVertex] = true;
-    
     while (queue.length > 0) {
         var visiting = queue[0];
         queue.shift();
@@ -177,13 +175,14 @@ function getPathAndAssignment (adjacencyMatrix, numberOfVertices, startVertexVec
 };
 
 var adjacencyMatrix = createAdjacencyMatrix(rows, columns);
-var numberOfTargetSets = Math.round((rows / robotLib.robotCounter) * 2);
-var targetSetMatrix = makeEmpty2DArray(numberOfTargetSets);
+var targetSetMatrix;
+
 // console.log(adjacencyMatrix);
 /* Example code for using functions above.
 var numberOfVertices = rows * columns;
 
 var startVertexVector = [1,4,7];
+var numberOfTargetSets = Math.round((rows / 3) * 2);
 targetSetMatrix = createTargetSets(numberOfTargetSets)
 
 var pathAndAssignment = getPathAndAssignment(adjacencyMatrix, numberOfVertices, startVertexVector, targetSetMatrix[0]);
@@ -196,4 +195,4 @@ console.log(pathAndAssignment[0]);
 */
 
 module.exports = { createFirstTargetSet, createTargetSets, createAdjacencyMatrix, makeEmpty2DArray, breadthFirstSearch, traceRoute,
-     getPathAndAssignment, adjacencyMatrix, numberOfTargetSets, targetSetMatrix };
+     getPathAndAssignment, adjacencyMatrix, targetSetMatrix, rows, columns };

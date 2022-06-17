@@ -1,21 +1,20 @@
 const robotLib = require("./Robot");
 const communication = require("./Communication");
 const actions = require("./Actions");
-const NUM_OF_ROBOTS = 4;
+let restart = 0;
 
 var commands = {
-  "rotateAck": actions.rotateAck,
+  "rotateAck": actions.rotateOrDrive,
   "obstacleDetected": actions.obstacleDetected,
   "goalDetected": actions.goalDetected,
   "begin": actions.begin,
-  "test": actions.test
+  "position": actions.position
 };
 
 function inputHandler(robot, topicArray, message){
   if(Object.getOwnPropertyNames(robot).some(property => property == topicArray[3])){
     switch(typeof(robot[topicArray[3]])){
       case "number":
-        console.log("server");
         robot[topicArray[3]] = parseInt(message);
         break;
       case "object":
@@ -32,10 +31,6 @@ function inputHandler(robot, topicArray, message){
         robot[topicArray[3]] = message;
         break;
     }
-  } else {
-
-    //Send error code to robot
-    console.log(`Error: property ${topicArray[3]} does not exist`);
   }
 }
 
@@ -58,18 +53,13 @@ communication.client.on("message", (topic, message) => {
   let splitTopic = topic.split('/');
   message = message.toString();
 
-  if(!(splitTopic[0] === "robots" && splitTopic[1] === "toServer" && splitTopic.length > 2)) 
-    return;
-  
+  if(!(splitTopic[0] === "robots" && splitTopic[1] === "toServer" && splitTopic.length > 2)) return;
+
   if(robotLib.robots.some(r => r.robotID === splitTopic[2])){
     var robot = robotLib.robots.filter(r => r.robotID === splitTopic[2]).pop();
     inputHandler(robot, splitTopic, message);
-    // console.log(robot);
-
-
   } else if(splitTopic[2] === "register" && splitTopic.length > 2){
     actions.registerRobot(splitTopic);
-    // print(robotLib.robotCounter);
     return;
   }
 
