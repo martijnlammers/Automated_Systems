@@ -12,6 +12,19 @@ upper_hsv2 =  np.array([179,255,255])
 lower_green_hsv =  np.array([45,50,50])
 upper_green_hsv =  np.array([70,255,255])
 
+MAX_DISTANCE = 100 #change if camera distance is increased/decreased
+
+robots = []
+
+class Robot:
+    def __init__(self, redPos, greenPos):
+        self.redPos = redPos
+        self.greenPos = greenPos
+        self.gridPos = -1 #unknown?
+        self.heading = -1 #unknown?
+        self.center = getCenterOfTwoPoints(redPos, greenPos)
+
+
 
 def drawCircles(img, name):
     # coords = cv.findNonZero(mask)
