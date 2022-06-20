@@ -27,7 +27,6 @@ ANGLE_ACCURACY = 1
 # Global variables.
 
 # Robot sensors and actuators
-
 r = Robot()
 motor_left = r.getDevice("wheel_left")
 motor_right = r.getDevice("wheel_right")
@@ -42,7 +41,7 @@ state = "NO_TASK"
 destination = None
 path = []
 
-def initializeRobot():
+def setupRobot():
     r.step(TIME_STEP)
     motor_left.setPosition(float('inf'))
     motor_right.setPosition(float('inf'))
@@ -76,8 +75,8 @@ def motorRotateLeft():
 
 
 def motorRotateRight():
-    motor_left.setVelocity(-ROTATE_SPEED)
-    motor_right.setVelocity(ROTATE_SPEED)
+    motor_left.setVelocity(ROTATE_SPEED)
+    motor_right.setVelocity(-ROTATE_SPEED)
     r.step(TIME_STEP)
 
 # Math source: https://www.cuemath.com/geometry/angle-between-vectors/
@@ -131,28 +130,24 @@ def getHeading():
 
 
 def rotateToTarget(destination):
-    initialAngle = calculateAngleToTarget(getVectors(destination))
-    newAngle = initialAngle
-
+    
     # This block is used to determine to rotate
     # clockwise or counter clockwise.
-
-    while(initialAngle == calculateAngleToTarget(getVectors(destination))):
-        motorRotateLeft()
+    
+    initialAngle = calculateAngleToTarget(getVectors(destination))
+    motorRotateLeft()
+    r.step(TIME_STEP)
     motorStop()
-    newAngle = calculateAngleToTarget(getVectors(destination))
-
+    
     # Rotate wheels until the angle is close
     # to 0 deg.
 
-    if(initialAngle > newAngle):
-        motorRotateLeft()
-        while(calculateAngleToTarget(getVectors(destination)) > ANGLE_ACCURACY):
-            r.step(TIME_STEP)
+    if(initialAngle > calculateAngleToTarget(getVectors(destination))):
+        motorRotateLeft() 
     else:
         motorRotateRight()
-        while(calculateAngleToTarget(getVectors(destination)) > ANGLE_ACCURACY):
-            r.step(TIME_STEP)
+    while(calculateAngleToTarget(getVectors(destination)) > ANGLE_ACCURACY):
+        r.step(TIME_STEP)
     motorStop()
     return
 
@@ -228,7 +223,7 @@ def translateToNodeNumber(pos):
 # MQTT functions
 def publish(topic, message):
     global robotId, client
-    client.publish(topic, message, 1)
+    client.publish(topic, message, qos=2)
     print(str(robotId) + " publishing to: " +
           str(topic) + " message: " + str(message))
 
@@ -247,6 +242,7 @@ def on_message(client, userdata, msg):
         path = []   
         next_positions = payload.split(',')
         for i in range(len(next_positions)):
+            print(int(next_positions[i]))
             path.append(int(next_positions[i]))
     elif(action.__eq__("register")):
         robotId = payload
@@ -255,8 +251,9 @@ def on_message(client, userdata, msg):
         messages = ["NO_TASK", "VIRTUAL", getHeading(
         ), translateToNodeNumber(gps_mid.getValues()), ""]
         for i in range(len(topics)):
-            publish(
-                f"robots/toServer/{robotId}{topics[i]}", messages[i])
+            pass
+            # publish(
+                # f"robots/toServer/{robotId}{topics[i]}", messages[i])
 
         # The MQTT format changes after registration
         # so the topic index also has to change.
@@ -270,22 +267,23 @@ def on_message(client, userdata, msg):
     return
 
 
-def initializeMQTTClient():
+def setupMQTT():
     client.on_connect = on_connect
     client.on_message = on_message
     client.username_pw_set(USERNAME, PASSWORD)
     client.connect(HOST, PORT, 5)
     client.subscribe("robots/toRobot/register/" + uuid)
     client.publish("robots/toServer/register/" + uuid, "")
+    print("setup")
 
 
 if __name__ == "__main__":
-    initializeRobot()
-    # initializeMQTTClient()
-    # while(r.step(TIME_STEP) != -1):
-        # client.loop()
-        # if(len(path) > 0):
-            # moveRobot(path.pop(0))
-            # r.step(TIME_STEP)\
-    moveRobot(0)
-    moveRobot(1)
+    setupRobot()
+    setupMQTT()
+    while(r.step(TIME_STEP) != -1):
+        client.loop()
+        if(len(path) > 0):
+            dest = path.pop(0)
+            moveRobot(dest)
+        r.step(TIME_STEP)
+    # moveRobot(0)

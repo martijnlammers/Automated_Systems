@@ -5,8 +5,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.3817143070340118 -0.6101117338842222 -0.6943038671808853 4.629699803926887
-  position 0.020008657632441487 -0.5822413627939342 0.8994819039357081
+  orientation 0.5129720328564487 -0.4199004711449616 -0.748694388812526 4.5507518520780605
+  position 0.00852406340803144 -2.1914193957706 3.7414737800110336
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -178,8 +178,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation 6.693537512954937e-07 0.059999947847937087 -0.019999509051121443
-        rotation -0.8093464070487966 -0.5307162786590629 -0.25159217985358673 4.317263579852344
+        translation 9.030550824317022e-07 0.06000055502855816 -0.019999477720704862
+        rotation -0.9263201560582314 0.07371797895789498 -0.36945450066093005 2.2097266631572268
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -189,22 +189,10 @@ Robot {
             }
           }
         ]
+        name "solid(5)"
         boundingObject USE caster
         physics Physics {
         }
-      }
-    }
-    BallJoint {
-      jointParameters BallJointParameters {
-        position -41.01351771477373
-        anchor 0 -0.06 -0.02
-      }
-      jointParameters2 JointParameters {
-        position -144.76811684986995
-      }
-      jointParameters3 JointParameters {
-        position -383.2551587140965
-        axis 0 1 0
       }
     }
     Solid {
@@ -234,8 +222,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058 5.8347e-05 -2.6015700000000104e-06
-        rotation 0.036205167124076044 0.9986893767263212 -0.03617616186813426 4.711876638565324
+        translation 0.058000008659390874 5.79777623360629e-05 -2.7326409946976555e-06
+        rotation -0.03958657053894222 -0.9984329302259047 0.03955486409380146 1.5715654863649113
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -266,8 +254,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.058 6.150729999999963e-06 -3.6725799999999946e-05
-        rotation -0.6587070619746317 -0.364558670249786 0.6581808128853776 2.441907632865235
+        translation -0.05800000876483282 5.580683895874445e-06 -3.679605555213034e-05
+        rotation -0.659404085105553 -0.36203174353425066 0.658877279331788 2.4463749687514817
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -303,7 +291,7 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation 0.313661 0.17822 0.0400952
+  translation 0.3038 0.188356 0.0400912
   rotation 0.0002694767081947588 1.0285413399530637e-05 -0.9999999636382565 1.5846374780430053
   children [
     InertialUnit {
@@ -464,8 +452,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation 6.693537512954937e-07 0.059999947847937087 -0.019999509051121443
-        rotation -0.8093464070487966 -0.5307162786590629 -0.25159217985358673 4.317263579852344
+        translation 9.030550824317022e-07 0.06000055502855816 -0.019999477720704862
+        rotation -0.9263201560582314 0.07371797895789498 -0.36945450066093005 2.2097266631572268
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -475,22 +463,10 @@ Robot {
             }
           }
         ]
+        name "solid(5)"
         boundingObject USE caster
         physics Physics {
         }
-      }
-    }
-    BallJoint {
-      jointParameters BallJointParameters {
-        position -41.01351771477373
-        anchor 0 -0.06 -0.02
-      }
-      jointParameters2 JointParameters {
-        position -144.76811684986995
-      }
-      jointParameters3 JointParameters {
-        position -383.2551587140965
-        axis 0 1 0
       }
     }
     Solid {
@@ -520,8 +496,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058 5.8347e-05 -2.6015700000000104e-06
-        rotation 0.036205167124076044 0.9986893767263212 -0.03617616186813426 4.711876638565324
+        translation 0.058000008659390874 5.79777623360629e-05 -2.7326409946976555e-06
+        rotation -0.03958657053894222 -0.9984329302259047 0.03955486409380146 1.5715654863649113
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -552,8 +528,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.058 6.150729999999963e-06 -3.6725799999999946e-05
-        rotation -0.6587070619746317 -0.364558670249786 0.6581808128853776 2.441907632865235
+        translation -0.05800000876483282 5.580683895874445e-06 -3.679605555213034e-05
+        rotation -0.659404085105553 -0.36203174353425066 0.658877279331788 2.4463749687514817
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -589,7 +565,7 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation -0.09 0.59 0.06
+  translation -0.29 1.2 0.06
   children [
     PointLight {
       attenuation 0 0 1
@@ -647,8 +623,7 @@ Floor {
   }
 }
 Floor {
-  translation 0.9 0.5 2e-05
-  rotation 0 0 1 1.5708
+  translation 1.2 0.8 2e-05
   name "floor(9)"
   size 1.2 0.2
   tileSize 0.2 0.2
@@ -657,7 +632,7 @@ Floor {
   }
 }
 Floor {
-  translation 0.1 1.2 2e-05
+  translation 0.1 1.4 2e-05
   name "floor(8)"
   size 0.6 0.2
   tileSize 0.2 0.2
