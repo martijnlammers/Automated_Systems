@@ -83,12 +83,17 @@ def getContours(originalImg, contourImg, color):
             
         # Draw a circle based centered at centroid coordinates
             if M["m00"] != 0:
-                if color == "red":
-                    cv.circle(originalImg, (round(M['m10'] / M['m00']), round(M['m01'] / M['m00'])), 1, (0, 255, 0), -1)
-                    posArray.append((round(M['m10'] / M['m00']), round(M['m01'] / M['m00'])))
-                elif color == "green":
-                    cv.circle(originalImg, (round(M['m10'] / M['m00']), round(M['m01'] / M['m00'])), 1, (0, 0, 255), -1)
-                    posArray.append((round(M['m10'] / M['m00']), round(M['m01'] / M['m00'])))
+                midpoint = (round(M['m10'] / M['m00']), round(M['m01'] / M['m00']))
+                if midpoint not in posArray:
+                    if color == "red":
+                        cv.circle(originalImg, midpoint, 4, (0, 255, 0), -1)
+                        posArray.append(midpoint)
+                    elif color == "green":
+                        cv.circle(originalImg, midpoint, 4, (0, 0, 255), -1)
+                        posArray.append(midpoint)
+    if posArray is None:
+        return list()
+    return posArray
                 
             
 
