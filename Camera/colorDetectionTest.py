@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import math
 
 video = 1
 
@@ -60,7 +61,8 @@ def drawCircles(img, name):
         #cv.waitKey(30000)
 
 
-def getContours(originalImg, contourImg, color, posArray):
+def getContours(originalImg, contourImg, color):
+    posArray = []
     gray_image = cv.cvtColor(contourImg, cv.COLOR_BGR2GRAY)
     ret, thresh = cv.threshold(gray_image, 50, 255, cv.THRESH_BINARY)
 
@@ -70,7 +72,7 @@ def getContours(originalImg, contourImg, color, posArray):
     #remove small contours
     goodContours = []
     for index, contour in enumerate(contours):
-        if cv.contourArea(contour) > 100:
+        if cv.contourArea(contour) > 150:
             goodContours.append(index)
 
     
@@ -92,10 +94,10 @@ def getContours(originalImg, contourImg, color, posArray):
 
 if(video):
     cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
-
+    firstFrame = True
     while(1):
         _, frame = cap.read()
-        frame = cv.resize(frame, (400, 600))
+        frame = cv.resize(frame, (450, 800))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         mask = cv.inRange(hsv, lower_hsv, upper_hsv)
@@ -114,7 +116,6 @@ if(video):
 
         if len(greenPositions) > 0 and len(redPositions) > 0:
             cv.line(output, greenPositions[0], redPositions[0], (0, 255, 255), 2)
-            cv.rectangle(frame, greenPositions[0], redPositions[0], (255, 0, 0), 2)
 
         cv.imshow("frame", frame)
         cv.imshow("output", output)
@@ -125,12 +126,11 @@ if(video):
 
     cap.release()
     output.release()
-
     cv.destroyAllWindows()
 
 else:
     frame = cv.imread("C:\\Users\\rtsmo\\Downloads\\colorTest.png")
-    frame = cv.resize(frame, (600, 400))
+    frame = cv.resize(frame, (1200, 675))
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
     mask = cv.inRange(hsv, lower_hsv, upper_hsv)
@@ -140,21 +140,12 @@ else:
 
     output = cv.bitwise_and(frame, frame, mask = mask3)
 
-    #gray_img = cv.cvtColor(mask2, cv.COLOR_BGR2GRAY)
     thresh_img = cv.threshold(mask2, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
 
     cnts = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    #contours, hierarchy = cnts
-    #print(f"cnts: {contours}, hierarchy: {hierarchy}")
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
-    #print(output)
-    #drawCircles(output, "red")
-    #drawCircles(output, "green")
     getContours(frame, output)
-
-    # cv.namedWindow('frame', cv.WINDOW_FULLSCREEN)
-    # cv.namedWindow('output', cv.WINDOW_FULLSCREEN)
 
     cv.imshow("frame", frame)
     cv.imshow("output", output)
