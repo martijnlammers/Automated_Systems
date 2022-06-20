@@ -96,6 +96,39 @@ def getContours(originalImg, contourImg, color):
     return posArray
                 
             
+def initRobots(distancesAndPoints, robotAmount):
+    distancesAndPoints.sort(key=lambda x: x[2])
+    for i in range(robotAmount):
+        robots.append(Robot(distancesAndPoints[i][0], distancesAndPoints[i][1]))
+
+def updateRobots(distanceAndPoints):
+    for robot in robots:
+        distToClosestCenter = 9999
+        closestCenter = (0,0)
+        for redPos, greenPos, distance in distanceAndPoints:
+            currentCenter = getCenterOfTwoPoints(redPos, greenPos)
+            distanceBetweenCenters = distBetweenPoints(robot.center, currentCenter)
+            if distanceBetweenCenters < distToClosestCenter and distance < MAX_DISTANCE:
+                closestCenter = currentCenter
+                distToClosestCenter = distanceBetweenCenters
+        robot.center = closestCenter
+        #TODO: TEST
+            
+def distBetweenPoints(p1, p2):
+    return math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))
+        
+
+def getCenterOfTwoPoints(p1, p2):
+    width = abs(p1[0] - p2[0])
+    height = abs(p1[1] - p2[1])
+    
+    xLeft = min(p1[0], p2[0])
+    yTop = min(p1[1], p2[1])
+
+    cX = int(xLeft + (width/2))
+    cY = int(yTop + (height/2))
+    return cX, cY
+
 
 if(video):
     cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
@@ -110,17 +143,44 @@ if(video):
         mask3 = cv.inRange(hsv, lower_green_hsv, upper_green_hsv)
 
         output = cv.bitwise_and(frame, frame, mask = (mask+mask2+mask3))
-        greenMasked = cv.bitwise_and(frame, frame, mask = (mask+mask2))
-        redMasked = cv.bitwise_and(frame, frame, mask = (mask3))
+        redMasked = cv.bitwise_and(frame, frame, mask = (mask+mask2))
+        greenMasked = cv.bitwise_and(frame, frame, mask = (mask3))
+        
 
-        redPositions = []
-        greenPositions = []
+        redPositions = getContours(output, redMasked, "red")
+        greenPositions = getContours(output, greenMasked, "green")
 
-        getContours(output, redMasked, "red", redPositions)
-        getContours(output, greenMasked, "green", greenPositions)
+        #creating robot objects TODO:
+        #get all positions of red and green contours
+        #sort them based on distance (distance should roughly be the same each time and for each pair)
+        #create a robot instance for each pair of red/green objects
+        
+        #updating robot object locations and variables TODO:
+        #get all positions of red/green contours
+        #get the positions that are closest to the previous positions, this is the location of the new position
 
-        if len(greenPositions) > 0 and len(redPositions) > 0:
+        #!!!CENTER OF THE TWO POINTS CLOSEST TO THE PREVIOUS CENTER WILL BE THE NEW POINTS
+        
+        distancesAndPoints = []
+
+        if greenPositions and redPositions:
+            for redPos in redPositions:
+                for greenPos in greenPositions:
+                    distance = distBetweenPoints(greenPos, redPos)
+                    distancesAndPoints.append((redPos, greenPos, distance))
+                    
             cv.line(output, greenPositions[0], redPositions[0], (0, 255, 255), 2)
+
+            #create robot objects
+            #in this stage it is important that the robots are spaced far enough apart from each other!
+            robotAmount = min(len(greenPositions), len(redPositions))
+        
+            if firstFrame:
+                firstFrame = False
+                initRobots(distancesAndPoints, robotAmount)
+            else:
+                ctr = updateRobots(distancesAndPoints)
+            
 
         cv.imshow("frame", frame)
         cv.imshow("output", output)
