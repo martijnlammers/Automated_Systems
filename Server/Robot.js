@@ -8,6 +8,7 @@ class Robot {
     constructor(robotID){
       this.robotID = robotID;
       this.position = 0;
+      this.previousPosition = 0;
       this.path = [];
       this.pathIndex = 0;
       this.model = "PHYSICAL";

@@ -15,7 +15,8 @@ const client = mqtt.connect(connectUrl, {
 const topicRobot = 'robots/toServer/#';
 
 function publishMessage(topic, message){
-  client.publish(topic, message);
+  // console.log("test");
+  client.publish(topic, message, {qos: 2, retain: false});
 }
 
 module.exports = { host, port, clientId, connectUrl, client, topicRobot, publishMessage};

@@ -117,11 +117,15 @@ function makeEmpty2DArray(numberOfRows) {
     return array;
 };
 
-function breadthFirstSearch(adjacencyMatrix, startVertex, numberOfVertices) {
+function breadthFirstSearch(adjacencyMatrix, robotPositions, startVertex, numberOfVertices) {
     var previous = makeEmpty2DArray(numberOfVertices);
     var visited = new Array(numberOfVertices).fill(false);
     var queue = [startVertex];
     visited[startVertex] = true;
+    robotPositions.forEach((robotPosition) => {
+        visited[robotPosition] = true;
+    });
+
     while (queue.length > 0) {
         var visiting = queue[0];
         queue.shift();
@@ -138,22 +142,25 @@ function breadthFirstSearch(adjacencyMatrix, startVertex, numberOfVertices) {
 };
 
 function traceRoute(previous, startVertex, targetVertex) {
-    if (startVertex == targetVertex) {
-        return [];
-    }
-
+    console.log("traceRoute begin");
+    console.log("startVertex", startVertex);
+    console.log("endVertex", targetVertex);
+    console.log("previous", previous);
     var path = [targetVertex];
+    if (startVertex == targetVertex) return path;
+
     var previousStep = previous[targetVertex][0];
-
     while (previousStep != startVertex) {
-      path.push(previousStep);
-      previousStep = previous[previousStep][0];
+        path.push(previousStep);
+        console.log(previousStep);
+        previousStep = previous[previousStep][0];
     }
-
+    // console.log("traceRoute end");
     return path.reverse();
 };
 
 function getPathAndAssignment (adjacencyMatrix, numberOfVertices, startVertexVector, targetSet) {
+  console.log("pathAndAssignment begin");
   var startVertex, targetVertex;
   var numberOfTargets = targetSet.length;
   var costMatrix = makeEmpty2DArray(robotLib.robotCounter);
@@ -165,12 +172,24 @@ function getPathAndAssignment (adjacencyMatrix, numberOfVertices, startVertexVec
     for (let targetIndex = 0; targetIndex < numberOfTargets; targetIndex++) {
       startVertex = startVertexVector[robotIndex];
       targetVertex = targetSet[targetIndex];
-      shortestPathStartToTarget = traceRoute(breadthFirstSearch(adjacencyMatrix, startVertex, numberOfVertices), startVertex, targetVertex);
+      console.log("indices (robot) (target)",robotIndex, targetIndex);
+      console.log("startVertexVector",startVertexVector);
+      console.log("startVertex",startVertex);
+      if (startVertexVector.includes(targetVertex) && targetVertex !== startVertex) {
+        shortestPathMatrix[robotIndex].push([]);
+        costMatrix[robotIndex][targetIndex] = Number.POSITIVE_INFINITY;
+        continue;
+      } 
+      let previous = breadthFirstSearch(adjacencyMatrix, startVertexVector, startVertex, numberOfVertices);
+      console.log(previous);
+      shortestPathStartToTarget = traceRoute(previous, startVertex, targetVertex);
       shortestPathMatrix[robotIndex].push(shortestPathStartToTarget);
       costMatrix[robotIndex][targetIndex] = shortestPathStartToTarget.length;
     }
   }
-
+  console.log("shortestPaths", shortestPathMatrix);
+  console.log("costMatrix", costMatrix);
+  console.log("pathAndAssignment end");
   return [shortestPathMatrix, costMatrix];
 };
 

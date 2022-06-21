@@ -64,19 +64,23 @@ function getRobotPositions() {
 function updatePaths(adjacencyMatrix, targetSet) {
     let startVertexVector = getRobotPositions();
     let pathAndAssingment = algorithms.getPathAndAssignment(adjacencyMatrix, algorithms.rows * algorithms.columns, startVertexVector, targetSet);
+
     let shortestPathMatrixRow, shortestPathMatrixColumn;
 
     optimalAssignment = munkres(pathAndAssingment[1]);
+    console.log("optimalAssigment", optimalAssignment);
     shortestPathMatrix = pathAndAssingment[0];
     
     for (robotIndex in robotLib.robots) {
         shortestPathMatrixRow = optimalAssignment[robotIndex][0];
         shortestPathMatrixColumn = optimalAssignment[robotIndex][1];
         robotLib.robots[robotIndex].path = shortestPathMatrix[shortestPathMatrixRow][shortestPathMatrixColumn];
+        robotLib.robots[robotIndex].pathIndex = 1;
     }
 }
 
 function removeObstaclesFromAdjacencyMatrix(adjacencyMatrix, obstaclePosition) {
+    // console.log("removing", obstaclePosition);
     adjacencyMatrix[obstaclePosition].fill(0);
     
     for (row in adjacencyMatrix) {
@@ -85,35 +89,35 @@ function removeObstaclesFromAdjacencyMatrix(adjacencyMatrix, obstaclePosition) {
 }
 
 function getUpdatedAdjacencyMatrix(obstacleLocation, robotPositions) {
-    var adjacencyMatrixCopy = JSON.parse(JSON.stringify(algorithms.adjacencyMatrix));
+    // var adjacencyMatrixCopy = JSON.parse(JSON.stringify(algorithms.adjacencyMatrix));
     
     for (obstacleIndex in obstacleLocation) { 
         let obstaclePosition = obstacleLocation[obstacleIndex]; 
-        console.log("obstaclePosition", obstaclePosition);
-        if (robotPositions.includes(obstaclePosition)) removeObstaclesFromAdjacencyMatrix(adjacencyMatrixCopy, obstaclePosition);
-        else {
-            removeObstaclesFromAdjacencyMatrix(algorithms.adjacencyMatrix, obstaclePosition);
-            removeObstaclesFromAdjacencyMatrix(adjacencyMatrixCopy, obstaclePosition);
-        }
+        // console.log("obstaclePosition", obstaclePosition);
+        if (robotPositions.includes(obstaclePosition)) continue
+        else removeObstaclesFromAdjacencyMatrix(algorithms.adjacencyMatrix, obstaclePosition);
     }
 
-    return adjacencyMatrixCopy;
+    return algorithms.adjacencyMatrix;
 }
 
 function obstacleDetected(robot) {
+    console.log("obstacleDetected", robot.robotID);
     robotLib.robots.forEach((currentRobot) => {
+        // console.log("ObstacleDetected", currentRobot.robotID);
         if(currentRobot.model === "PHYSICAL") {
             communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/drive`, 0);
         } else {
             communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/stop`, "");
         }
     });
-
+    // console.log("=================================");
+    // console.log(robotLib.targetSetIndex);
     let targetSet = algorithms.targetSetMatrix[robotLib.targetSetIndex];
     let obstacleLocations = getObstacleLocations(robot.position, robot.heading, robot.obstacleDetected);
     let robotPositions = getRobotPositions();
+    console.log("obstacleLocations:", obstacleLocations);
     let updatedAdjacencyMatrix = getUpdatedAdjacencyMatrix(obstacleLocations, robotPositions);
-    console.log("=================================");
     updatePaths(updatedAdjacencyMatrix, targetSet);
 
     sendPathOrInstructionToRobot();
@@ -172,10 +176,10 @@ function rotateOrDrive(robot) {
 
 function sendPathOrInstructionToRobot() {
     robotLib.robots.forEach((currentRobot) => {
-        if (currentRobot.path.length === 0) return;
+        console.log("path:", currentRobot.path);
 
-        if(currentRobot.model === "VIRTUAL") communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/setPath`, `${currentRobot.path}`);
-        else rotateOrDrive(currentRobot);
+        if(currentRobot.model === "VIRTUAL") communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/path`, `${currentRobot.path}`);
+        // else rotateOrDrive(currentRobot);
     });
 }
 
@@ -198,15 +202,20 @@ function begin(robot){
     for (assignmentIndex in optimalAssignments) {
         currentOptimalAssingment = optimalAssignments[assignmentIndex];
         robotLib.robots[assignmentIndex].path = pathAndAssignment[0][currentOptimalAssingment[0]][currentOptimalAssingment[1]];
+        // console.log(robotLib.robots[assignmentIndex].path);
     }
-
+    // console.log(3);
     sendPathOrInstructionToRobot();
 }
 
 function position(robot) {
+    console.log("position", robot.robotID);
+    console.log(robot.path);
+    // console.log(robot.path.length, robot.pathIndex);
     if (robot.pathIndex === robot.path.length && robot.path.length > 0) {
         robotLib.readyForNextTarget++;
-        if (robotLib.readyForNextTarget === robotLib.NUM_OF_ROBOTS) {  //last robot sends pos before others?
+        console.log("readyForNextTarget", robotLib.readyForNextTarget);
+        if (robotLib.readyForNextTarget === robotLib.NUM_OF_ROBOTS) {
             robotLib.readyForNextTarget = 0;
             robotLib.targetSetIndex++;
 
@@ -220,10 +229,13 @@ function position(robot) {
     }
     // TO DO CHECK PARAMETER (IS THE TOPIC THE SAME)
     if (robot.model === "VIRTUAL") {
+        // console.log("test1");
         robot.pathIndex++;
+        return;
     }
 
     if (robot.position === robot.path[robot.pathIndex + 1] ) {
+        console.log("test2");
         robot.pathIndex++;
         communication.publishMessage(`robots/toRobot/${robot.robotID}/drive`, 0);   //test if necessery
 
