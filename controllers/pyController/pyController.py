@@ -39,6 +39,7 @@ robotId, uuid = None, uuid.uuid4().hex
 action_index = 2
 state = "NO_TASK"
 destination = None
+found_target = False
 path = []
 
 def setupRobot():
@@ -153,9 +154,9 @@ def rotateToTarget(destination):
 
 
 def moveToTarget(destination):
-    global path
-    found_target, obstacle = False, False
-    
+    global path, found_target, on_target_pos
+    obstacle = False
+   
     # The condition variable is used to
     # constructs a do-while loop, which
     # don't exist in Python.
@@ -182,9 +183,8 @@ def moveToTarget(destination):
     publish("robots/toServer/" + robotId + "/state", "NO_TASK")
    
     if(found_target):
-        print("found")
-        # Send MQTT data
-        # found_target = False
+        path = []
+        publish(f"robots/toServer/{robotId}/goalDetected", "true")
         
     elif(obstacle):                                            # v Where the obstacle is found.
         path = []                                              # v [North, East, South, West]         
@@ -233,27 +233,25 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    global action_index, robotId, path, uuid
+    global action_index, robotId, path, uuid, found_target
     action = str(msg.topic).split("/")[action_index]
     payload = str(msg.payload.decode("utf-8"))
     print(action + " " + payload + " " + uuid)
 
-    if(action.__eq__("setPath")):
+    if(action.__eq__("path")):
         path = []   
         next_positions = payload.split(',')
         for i in range(len(next_positions)):
-            print(int(next_positions[i]))
             path.append(int(next_positions[i]))
     elif(action.__eq__("register")):
         robotId = payload
-        client.subscribe("robots/toRobot/" + robotId + "/#")
+        client.subscribe(f"robots/toRobot/{robotId}/#")
         topics = ["/state", "/model", "/heading", "/position", "/begin"]
         messages = ["NO_TASK", "VIRTUAL", getHeading(
         ), translateToNodeNumber(gps_mid.getValues()), ""]
         for i in range(len(topics)):
-            pass
-            # publish(
-                # f"robots/toServer/{robotId}{topics[i]}", messages[i])
+            publish(
+                f"robots/toServer/{robotId}{topics[i]}", messages[i])
 
         # The MQTT format changes after registration
         # so the topic index also has to change.
@@ -262,8 +260,12 @@ def on_message(client, userdata, msg):
     elif(action.__eq__("stop")):
         motorStop()
         path = []
-    else:
-        print("wat")
+    elif(action.__eq__("goalDetected")):
+        target_found = True
+    elif(action.__eq__("end")):
+        path = []
+        client.unsubscribe(f"robots/toRobot/register/{uuid}")
+        client.unsubscribe(f"robots/toRobot/{robotId}/#")
     return
 
 
@@ -274,8 +276,6 @@ def setupMQTT():
     client.connect(HOST, PORT, 5)
     client.subscribe("robots/toRobot/register/" + uuid)
     client.publish("robots/toServer/register/" + uuid, "")
-    print("setup")
-
 
 if __name__ == "__main__":
     setupRobot()
