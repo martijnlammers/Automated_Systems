@@ -58,6 +58,16 @@ def drawGrid(frame):
         
     grid.gridDefined = True
 
+def objPositionOnGrid(xPos, yPos):
+    gridPosX = int(xPos / grid.width)
+    gridPosY = int(yPos / grid.height)
+    gridNum = gridPosX + (gridPosY * grid.xGridSize)
+
+    print(f"grX: {gridPosX}, grY: {gridPosY}, grNum: {gridNum}")
+    cv.circle(output, (xPos, yPos), 10, (0,255,255), cv.FILLED)
+
+    drawGrid(output)
+
 def drawCircles(img, name):
     # coords = cv.findNonZero(mask)
     # for coord in coords:
@@ -166,6 +176,7 @@ if(video):
     firstFrame = True
     while(1):
         _, frame = cap.read()
+
         frame = cv.resize(frame, (450, 800))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
@@ -213,6 +224,8 @@ if(video):
                 ctr = updateRobots(distancesAndPoints)
 
         drawGrid(output)
+        for robot in robots:
+            objPositionOnGrid(robot.center[0], robot.center[1])
 
         cv.imshow("frame", frame)
         cv.imshow("output", output)
