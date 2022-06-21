@@ -26,6 +26,17 @@ class Robot:
         self.center = getCenterOfTwoPoints(redPos, greenPos)
 
 
+class Grid():
+    def __init__(self, xGridSize = 10, yGridSize = 10, gridWidth = 0, gridHeight = 0, frameHeight = 0, frameWidth = 0):
+        self.xGridSize = xGridSize
+        self.yGridSize = yGridSize
+        self.width = gridWidth
+        self.height = gridHeight
+        self.frameHeight = frameHeight
+        self.frameWidth = frameWidth
+        self.gridDefined = False
+grid = Grid()
+
 
 def drawCircles(img, name):
     # coords = cv.findNonZero(mask)
