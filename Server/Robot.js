@@ -2,7 +2,7 @@ var robots = [];
 var robotCounter = 0;
 var targetSetIndex = 0;
 var readyForNextTarget = 0;
-const NUM_OF_ROBOTS = 2; // Can not be bigger than algorithm.rows
+const NUM_OF_ROBOTS = 4; // Can not be bigger than algorithm.rows
 
 class Robot {
     constructor(robotID){

@@ -5,6 +5,7 @@ const munkres = require("munkres-js");
 
 const ANGLE_MARGIN = 3;
 const MOTOR_SPEED = 90;
+var visitedLocations = new Array(100).fill(false);
 
 // CHECK VARIABLE AND FUNCTION NAMES
 function getVerticesAroundLocation(location) {
@@ -68,7 +69,7 @@ function updatePaths(adjacencyMatrix, targetSet) {
     let shortestPathMatrixRow, shortestPathMatrixColumn;
 
     optimalAssignment = munkres(pathAndAssingment[1]);
-    console.log("optimalAssigment", optimalAssignment);
+    // console.log("optimalAssigment", optimalAssignment);
     shortestPathMatrix = pathAndAssingment[0];
     
     for (robotIndex in robotLib.robots) {
@@ -101,8 +102,27 @@ function getUpdatedAdjacencyMatrix(obstacleLocation, robotPositions) {
     return algorithms.adjacencyMatrix;
 }
 
+function getTargetSet() {
+    if (robotLib.targetSetIndex !== algorithms.targetSetMatrix.length) {
+        // console.log("MATRIX");
+        return algorithms.targetSetMatrix[robotLib.targetSetIndex];
+    } else {
+        // console.log("UNVISITED");
+        let targetSet = [];
+        let targetCounter = 0;
+        while(targetCounter < robotLib.NUM_OF_ROBOTS) {
+            let unvisitedLocation = visitedLocations.findIndex(location => location == false);
+            if (unvisitedLocation == -1) return false;
+            visitedLocations[unvisitedLocation] = true;
+            targetSet.push(unvisitedLocation);
+            targetCounter++;
+        }
+        return targetSet;
+    }
+}
+
 function obstacleDetected(robot) {
-    console.log("obstacleDetected", robot.robotID);
+    // console.log("obstacleDetected", robot.robotID);
     robotLib.robots.forEach((currentRobot) => {
         // console.log("ObstacleDetected", currentRobot.robotID);
         if(currentRobot.model === "PHYSICAL") {
@@ -113,11 +133,15 @@ function obstacleDetected(robot) {
     });
     // console.log("=================================");
     // console.log(robotLib.targetSetIndex);
-    let targetSet = algorithms.targetSetMatrix[robotLib.targetSetIndex];
     let obstacleLocations = getObstacleLocations(robot.position, robot.heading, robot.obstacleDetected);
     let robotPositions = getRobotPositions();
-    console.log("obstacleLocations:", obstacleLocations);
+    obstacleLocations.forEach((location) => {visitedLocations[location] = true;});
+    robotPositions.forEach((location) => {visitedLocations[location] = true;});
+    // console.log("obstacleLocations:", obstacleLocations);
+
     let updatedAdjacencyMatrix = getUpdatedAdjacencyMatrix(obstacleLocations, robotPositions);
+    let targetSet = getTargetSet();
+    if (!targetSet) return;
     updatePaths(updatedAdjacencyMatrix, targetSet);
 
     sendPathOrInstructionToRobot();
@@ -131,14 +155,32 @@ function getGoalLocation(robotLocation, heading) {
 }
 
 function goalDetected(robot) {
+    console.log("goalDetected", robot.robotID);
+    robotLib.robots.forEach((currentRobot) => {
+        console.log("robotID", currentRobot.robotID);
+        console.log("position", currentRobot.position);
+        currentRobot.goalDetected = true;
+        if(currentRobot.model === "PHYSICAL") {
+            communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/drive`, 0);
+        } else {
+            communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/stop`, "");
+            communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/goalDetected`, "true");
+        }
+    });
+
     let goalLocation = getGoalLocation(robot.position, robot.heading);
+    console.log("goalLocation", goalLocation);
     let locationLeftOfGoal = goalLocation - 1;
     let locationRightOfGoal = goalLocation + 1;
     let locationAboveGoal = goalLocation - algorithms.columns;
     let locationBelowGoal = goalLocation + algorithms.columns;
     let targetSet = [locationLeftOfGoal, locationRightOfGoal, locationAboveGoal, locationBelowGoal];
+    // let targetSet = [locationBelowGoal, locationLeftOfGoal];
 
+    removeObstaclesFromAdjacencyMatrix(algorithms.adjacencyMatrix, goalLocation);
     updatePaths(algorithms.adjacencyMatrix, targetSet);
+    sendPathOrInstructionToRobot();
+
 }
 
 function registerRobot(topicArray) {
@@ -176,7 +218,7 @@ function rotateOrDrive(robot) {
 
 function sendPathOrInstructionToRobot() {
     robotLib.robots.forEach((currentRobot) => {
-        console.log("path:", currentRobot.path);
+        // console.log("path:", currentRobot.path);
 
         if(currentRobot.model === "VIRTUAL") communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/path`, `${currentRobot.path}`);
         // else rotateOrDrive(currentRobot);
@@ -211,15 +253,24 @@ function begin(robot){
 function position(robot) {
     console.log("position", robot.robotID);
     console.log(robot.path);
+
+    visitedLocations[robot.position] = true;
+
     // console.log(robot.path.length, robot.pathIndex);
     if (robot.pathIndex === robot.path.length && robot.path.length > 0) {
+        if (robot.goalDetected) {
+            communication.publishMessage(`robots/toRobot/${robot.robotID}/end`, "")
+            console.log("robotID done", robot.robotID);
+            return;
+        }
         robotLib.readyForNextTarget++;
         console.log("readyForNextTarget", robotLib.readyForNextTarget);
         if (robotLib.readyForNextTarget === robotLib.NUM_OF_ROBOTS) {
             robotLib.readyForNextTarget = 0;
-            robotLib.targetSetIndex++;
+            if (robotLib.targetSetIndex !== algorithms.targetSetMatrix.length) robotLib.targetSetIndex++;
 
-            let targetSet = algorithms.targetSetMatrix[robotLib.targetSetIndex];
+            let targetSet = getTargetSet();
+            if (!targetSet) return;
             updatePaths(algorithms.adjacencyMatrix, targetSet);
             
             sendPathOrInstructionToRobot();
@@ -235,7 +286,7 @@ function position(robot) {
     }
 
     if (robot.position === robot.path[robot.pathIndex + 1] ) {
-        console.log("test2");
+        // console.log("test2");
         robot.pathIndex++;
         communication.publishMessage(`robots/toRobot/${robot.robotID}/drive`, 0);   //test if necessery
 
