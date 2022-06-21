@@ -189,12 +189,12 @@ def moveToTarget(destination):
     elif(obstacle):                                            # v Where the obstacle is found.
         path = []                                              # v [North, East, South, West]         
         publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
-        print("obstacle")
+  
 def moveRobot(node_number):
     global path, destination
     destination = translateToCoordinates(node_number)
     m_robotPos = gps_mid.getValues()
-    
+    print(destination)
     # Quits function when the destination equals the current position.
 
     if (m.fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC and
@@ -282,7 +282,6 @@ if __name__ == "__main__":
     setupMQTT()
     while(r.step(TIME_STEP) != -1):
         client.loop()
-        print(f"{robotId} {path}")
         if(len(path) > 0):
             dest = path.pop(0)
             moveRobot(dest)
