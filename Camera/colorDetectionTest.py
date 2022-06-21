@@ -38,6 +38,26 @@ class Grid():
 grid = Grid()
 
 
+def drawGrid(frame):
+    gridY, gridX = (0,0)
+    grid.frameHeight, grid.frameWidth, _ = frame.shape
+    xSizeKnown = False
+    gridCounter = 0
+    grid.width = int(grid.frameWidth/grid.xGridSize)
+    grid.height = int(grid.frameHeight/grid.yGridSize)
+
+    for gridY in range(grid.height, grid.frameHeight, grid.height-1):
+        for gridX in range(grid.width, grid.frameWidth, grid.width-1):
+            
+            cv.rectangle(frame, (gridX- grid.width, gridY - grid.height), (gridX, gridY), (0,255,0), 2)
+            cv.putText(frame, f"{gridCounter}", (int(gridX - (grid.width/1.2)), int(gridY - (grid.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
+            gridX += grid.width
+            gridCounter += 1
+        gridY += grid.height
+        xSizeKnown = True
+        
+    grid.gridDefined = True
+
 def drawCircles(img, name):
     # coords = cv.findNonZero(mask)
     # for coord in coords:
@@ -191,7 +211,8 @@ if(video):
                 initRobots(distancesAndPoints, robotAmount)
             else:
                 ctr = updateRobots(distancesAndPoints)
-            
+
+        drawGrid(output)
 
         cv.imshow("frame", frame)
         cv.imshow("output", output)
