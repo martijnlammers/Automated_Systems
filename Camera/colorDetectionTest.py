@@ -31,42 +31,29 @@ class Robot:
 
 
 class Grid():
-    def __init__(self, xGridSize = 10, yGridSize = 10, gridWidth = 0, gridHeight = 0, frameHeight = 0, frameWidth = 0):
+
+    # Default grid is 10x10 in size
+    def __init__(self, frame, xGridSize = 10, yGridSize = 10):
         self.xGridSize = xGridSize
         self.yGridSize = yGridSize
-        self.width = gridWidth
-        self.height = gridHeight
-        self.frameHeight = frameHeight
-        self.frameWidth = frameWidth
-        self.gridDefined = False
-grid = Grid()
+        self.frameHeight, self.frameWidth, _ = frame.shape
+        self.width = int(self.frameWidth/self.xGridSize)
+        self.height = int(self.frameHeight/self.yGridSize)
+    
+    def positionOnGrid(self, xPos, yPos):
+        gridPosX = int(xPos / self.width)
+        gridPosY = int(yPos / self.height)
+        gridNum = gridPosX + (gridPosY * self.xGridSize)
+        return gridNum
 
+    def draw(self, img):
+        gridCounter = 0
 
-def drawGrid(frame):
-    gridY, gridX = (0,0)
-    grid.frameHeight, grid.frameWidth, _ = frame.shape
-    xSizeKnown = False
-    gridCounter = 0
-    grid.width = int(grid.frameWidth/grid.xGridSize)
-    grid.height = int(grid.frameHeight/grid.yGridSize)
-
-    for gridY in range(grid.height, grid.frameHeight, grid.height-1):
-        for gridX in range(grid.width, grid.frameWidth, grid.width-1):
-            
-            cv.rectangle(frame, (gridX- grid.width, gridY - grid.height), (gridX, gridY), (0,255,0), 2)
-            cv.putText(frame, f"{gridCounter}", (int(gridX - (grid.width/1.2)), int(gridY - (grid.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
-            gridX += grid.width
-            gridCounter += 1
-        gridY += grid.height
-        xSizeKnown = True
-        
-    grid.gridDefined = True
-
-def objPositionOnGrid(xPos, yPos):
-    gridPosX = int(xPos / grid.width)
-    gridPosY = int(yPos / grid.height)
-    gridNum = gridPosX + (gridPosY * grid.xGridSize)
-    return gridNum
+        for gridY in range(self.height, self.frameHeight, self.height-1):
+            for gridX in range(self.width, self.frameWidth, self.width-1):
+                cv.rectangle(img, (gridX- self.width, gridY - self.height), (gridX, gridY), (0,255,0), 2)
+                cv.putText(img, f"{gridCounter}", (int(gridX - (self.width/1.2)), int(gridY - (self.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
+                gridCounter += 1
 
 def getContours(originalImg, contourImg, color):
     posArray = []
@@ -163,6 +150,8 @@ if(video):
         
         redPositions = getContours(processedImg, redMasked, "red")
         greenPositions = getContours(processedImg, greenMasked, "green")
+
+        grid = Grid(processedImg)
         
         # Get all positions and distances of red and green contours
         distancesAndPoints = []
@@ -181,13 +170,13 @@ if(video):
                 initRobots(distancesAndPoints, robotAmount)
                 for robot in robots:
                     robot.drawSelf(processedImg)
-                drawGrid(processedImg)
+                grid.draw(processedImg)
             else:
-                drawGrid(processedImg)
+                grid.draw(processedImg)
                 for robot in robots:
                     updateRobot(robot, distancesAndPoints)
 
-                    gridPos = objPositionOnGrid(robot.center[0], robot.center[1])
+                    gridPos = grid.positionOnGrid(robot.center[0], robot.center[1])
                     robot.gridPos = gridPos
                     robot.drawSelf(processedImg)
         
