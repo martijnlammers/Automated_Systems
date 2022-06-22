@@ -162,20 +162,27 @@ def moveToTarget(destination):
     # don't exist in Python.
     
     condition = True
-    
-    while(condition and not found_target and not obstacle):
-        motorMoveForward()
+    motorMoveForward()
+    while(condition):
         vectors = getVectors(destination)
         lengthToDestination = abs(m.sqrt(m.pow(vectors[0][0], 2) + m.pow(vectors[0][1], 2)))
         # found_target = True if (sensor_light.getValue() > 450) else False
         # obstacle = True if (sensor_ground.getValue() == 1000 or sensor_dist.getValue() < 400) else False
-        if(sensor_dist.getValue() < 500):
+        if(sensor_dist.getValue() < 600):
             motorStop()
-            time.sleep(0.7)
             updateRobotData()
             path = []
-            publish(f"robots/toServer/{robotId}/robotDetected", "1,0,0,0")
+            time.sleep(0.5)
+            publish(f"robots/toServer/{robotId}/robotDetected", "1,0,0,0")        
+            return        
+        if(sensor_ground.getValue() == 1000):
+            motorStop()
+            updateRobotData()
+            path = []
+            time.sleep(0.5)
+            publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
             return
+        motorMoveForward()
         condition = (lengthToDestination > POS_MATCHING_ACC)
         r.step(TIME_STEP)
     if(not found_target and not obstacle):

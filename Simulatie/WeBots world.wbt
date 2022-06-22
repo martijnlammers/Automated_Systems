@@ -5,8 +5,8 @@ WorldInfo {
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.3664362369340824 -0.3469177059928981 -0.863349633422181 4.582558310091507
-  position 0.9363751432575128 -0.9184751540965951 1.6589059631295804
+  orientation 0.4542058129211323 -0.4601834360504444 -0.7628422410259279 4.514006893790976
+  position 0.8276230521111193 -0.4427783713867388 2.723977785082323
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -178,8 +178,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation -7.737744747160491e-07 0.05999911581758058 -0.01999987420804248
-        rotation 0.3268353284020226 -0.8787833527880348 -0.3477333561379503 1.7423117042304626
+        translation -7.73774492817648e-07 0.0599991158175729 -0.019999874161554333
+        rotation 0.3268353273714181 -0.8787833530387975 -0.3477333564728958 1.7423117053582755
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -193,8 +193,6 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
-        linearVelocity -2.3734744564692363e-12 1.4980083673214018e-12 2.898943069042268e-14
-        angularVelocity -1.505997378369109e-10 -2.3660241034958294e-10 -1.133923632677391e-13
       }
     }
     Solid {
@@ -224,8 +222,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058000008659390874 6.574372122408378e-05 5.168627415617279e-06
-        rotation -0.03283955240614038 0.9989218409702141 0.0328134032133603 4.712109385073172
+        translation 0.058000008659390874 6.57437212240838e-05 5.168627415617265e-06
+        rotation -0.032839552406140365 0.9989218409702141 0.03281340321336037 4.712109385073172
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -242,8 +240,6 @@ Robot {
         boundingObject USE wheel_left
         physics DEF Physics_wh Physics {
         }
-        linearVelocity -3.486267359356762e-12 3.867704207974859e-12 4.696619081237617e-13
-        angularVelocity -1.2533386040214345e-10 4.01552047695801e-12 -4.0417924306629654e-11
       }
     }
     HingeJoint {
@@ -259,7 +255,7 @@ Robot {
       ]
       endPoint DEF wheel_right Solid {
         translation -0.05800000876483282 -5.082204524014461e-05 -4.5218163145010996e-05
-        rotation -0.6991331027760711 -0.15233662280057111 0.6985745901164887 2.839006067403683
+        rotation -0.6991331027760711 -0.15233662280057095 0.6985745901164887 2.839006067403683
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -276,8 +272,6 @@ Robot {
         boundingObject USE wheel_right
         physics DEF Physics_wh Physics {
         }
-        linearVelocity 3.5763468391423372e-12 -1.0234732438000668e-12 4.900802832290399e-13
-        angularVelocity 3.069702206490997e-11 -1.1381063504013837e-12 -4.0350376802058354e-11
       }
     }
     DEF Body1 Shape {
@@ -295,12 +289,10 @@ Robot {
   }
   controller "pyController"
   synchronization FALSE
-  linearVelocity 4.625278419421881e-14 1.4237933504384807e-12 2.5117437267603542e-14
-  angularVelocity -6.808439322379407e-14 -5.79212544733806e-14 -4.0363436752986605e-11
 }
 Robot {
-  translation 0.4933307593133721 1.78581226229872 0.039953034046337044
-  rotation 0.0011097539519762153 -0.000420210579733377 0.9999992959343694 1.1907500567498297
+  translation 2.0911 2.18489 0.0399756
+  rotation -0.010783395509874966 -0.0032476286477117824 0.9999365836339043 -0.11825530717958621
   children [
     InertialUnit {
       rotation 0 0 1 -1.5707953071795862
@@ -460,8 +452,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation -7.162378370395572e-07 0.06000092893093534 -0.019999857428507677
-        rotation -0.35486785853349057 0.029577894244937928 0.9344484743162084 2.7165698455926726
+        translation -7.162383809066444e-07 0.06000092893061946 -0.01999985789550155
+        rotation 0.3548678627994464 -0.02957789043456433 -0.9344484728167702 3.5666154631316718
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -475,8 +467,6 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
-        linearVelocity -2.159169240182337e-12 3.4154273428191035e-12 -1.2622826392058334e-14
-        angularVelocity -3.445381643421499e-10 -2.053785601760093e-10 1.591165115634313e-13
       }
     }
     Solid {
@@ -506,7 +496,7 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058000008659390874 -8.89079557049938e-06 -2.0054210544554564e-05
+        translation 0.058000008659390874 -8.890795570498262e-06 -2.0054210544549183e-05
         rotation 0.43753611873518505 0.7857671888983899 -0.4371865387370388 4.474373040690045
         children [
           DEF wheel_left Shape {
@@ -524,8 +514,6 @@ Robot {
         boundingObject USE wheel_left
         physics DEF Physics_wh Physics {
         }
-        linearVelocity -5.40203761460391e-13 1.3430155209502614e-12 4.72881729112192e-13
-        angularVelocity -1.259708693736389e-11 -3.204147832172979e-11 -3.925321812189391e-11
       }
     }
     HingeJoint {
@@ -541,7 +529,7 @@ Robot {
       ]
       endPoint DEF wheel_right Solid {
         translation -0.05800000876483282 -0.00012271821660172146 0.00010647118951610408
-        rotation 0.5820026205739943 -0.5684072145787934 -0.5815377787038263 2.107174721057171
+        rotation 0.5820026205739944 -0.5684072145787935 -0.5815377787038263 2.107174721057171
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -558,8 +546,6 @@ Robot {
         boundingObject USE wheel_right
         physics DEF Physics_wh Physics {
         }
-        linearVelocity -5.5419591296452e-12 1.1122084460429346e-12 4.3059213100707245e-13
-        angularVelocity -6.871765524088186e-11 -1.7238906745269129e-10 -3.9419816242898e-11
       }
     }
     DEF Body1 Shape {
@@ -577,8 +563,6 @@ Robot {
   }
   controller "pyController"
   synchronization FALSE
-  linearVelocity -3.0364452436433587e-12 1.2291895804369918e-12 -6.608544325600932e-15
-  angularVelocity 1.0840552652073746e-13 -1.6649067880631442e-13 -3.921492728880264e-11
 }
 Robot {
   translation -0.1096462747858475 1.2034730536184797 0.03998904468022648
@@ -742,8 +726,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation 6.225224512962368e-07 0.059999387842821106 -0.019999203907709148
-        rotation 0.5718431387791644 -0.49193038241653136 0.6565058442136813 -2.775139719727038
+        translation 6.225225005958119e-07 0.05999938784291391 -0.01999920349145168
+        rotation -0.5718431386669102 0.49193038108115184 -0.6565058453120809 2.7751397218447726
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -757,8 +741,6 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
-        linearVelocity -1.4364756166159944e-12 -4.791414838431824e-12 1.278848028171789e-14
-        angularVelocity 4.841290754696575e-10 -1.3835978608915517e-10 1.3663713913136357e-13
       }
     }
     Solid {
@@ -788,7 +770,7 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058000008659390874 5.717669754784409e-05 -3.4277145201627086e-06
+        translation 0.058000008659390874 5.7176697547843064e-05 -3.4277145201612517e-06
         rotation -0.04649445447066791 -0.9978376578852027 0.04645722989641215 1.5721618710386551
         children [
           DEF wheel_left Shape {
@@ -806,8 +788,6 @@ Robot {
         boundingObject USE wheel_left
         physics DEF Physics_wh Physics {
         }
-        linearVelocity 1.5902619651487976e-12 -3.2229092311776655e-12 4.599631795254849e-13
-        angularVelocity 1.0755237534419738e-10 2.092797430311401e-12 2.585010515350655e-11
       }
     }
     HingeJoint {
@@ -822,8 +802,8 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.05800000876483282 5.673918215514201e-05 1.7714447470589296e-05
-        rotation 0.535988084356775 0.652604356673288 -0.5355598258631786 4.298731924452603
+        translation -0.05800000876483282 5.673918215514407e-05 1.7714447470588686e-05
+        rotation 0.5359880843567751 0.652604356673288 -0.5355598258631787 4.298731924452603
         children [
           DEF wheel_right Shape {
             appearance PBRAppearance {
@@ -840,8 +820,6 @@ Robot {
         boundingObject USE wheel_right
         physics DEF Physics_wh Physics {
         }
-        linearVelocity -1.3719379804075355e-12 -6.283916752939972e-12 4.725676000994322e-13
-        angularVelocity 2.0852608224955677e-10 4.304758652638037e-12 2.586855611453617e-11
       }
     }
     DEF Body1 Shape {
@@ -859,12 +837,10 @@ Robot {
   }
   controller "pyController"
   synchronization FALSE
-  linearVelocity 1.1086064744473348e-13 -4.759487736893648e-12 2.5341034632003575e-15
-  angularVelocity 1.9202485724425686e-13 -1.166564611434959e-13 2.5830666168107305e-11
 }
 Robot {
-  translation 1.5039799999969488 1.0098100000052754 0.03987456623794727
-  rotation 0.004074782839767531 -0.0011062926807657318 -0.9999910860909277 0.49365472947122435
+  translation 1.52228 0.40011 0.0387949
+  rotation 0.05941100309892998 -0.03456350180286254 0.9976350520375186 0.0300193
   children [
     InertialUnit {
       rotation 0 0 1 -1.5707953071795862
@@ -1024,8 +1000,8 @@ Robot {
         axis 0 1 0
       }
       endPoint Solid {
-        translation 2.0441865611342536e-07 0.06000084637955405 -0.01999920128039563
-        rotation 0.7344142410709646 0.2445562559200561 0.6331097536782412 -2.4123568241140996
+        translation 2.0441865934977885e-07 0.06000084638015119 -0.019999200978284767
+        rotation -0.7344142405430233 -0.24455625636685252 -0.6331097541180711 2.412356822345675
         children [
           DEF caster Shape {
             appearance PBRAppearance {
@@ -1039,8 +1015,6 @@ Robot {
         boundingObject USE caster
         physics Physics {
         }
-        linearVelocity -2.5841858262362684e-12 -2.4437659667548817e-12 5.651075444635308e-09
-        angularVelocity 2.404667648387558e-10 -2.549122324464811e-10 -8.891814871987911e-15
       }
     }
     Solid {
@@ -1071,7 +1045,7 @@ Robot {
       ]
       endPoint DEF wheel_left Solid {
         translation 0.058000008659390874 4.84000021212403e-05 0.00011937713752758446
-        rotation -0.6132387374086448 0.49847469793256616 0.6127489098011423 4.067084276738514
+        rotation -0.6132387374086453 0.4984746979325666 0.612748909801141 4.067084276738515
         children [
           DEF wheel_left Shape {
             appearance PBRAppearance {
@@ -1088,8 +1062,6 @@ Robot {
         boundingObject USE wheel_left
         physics DEF Physics_wh Physics {
         }
-        linearVelocity -2.812738388654527e-12 -3.7556629805760914e-13 5.653453857594389e-09
-        angularVelocity 4.90352297315953e-11 -2.6400854021618038e-11 1.866345541820348e-11
       }
     }
     HingeJoint {
@@ -1104,7 +1076,7 @@ Robot {
         }
       ]
       endPoint DEF wheel_right Solid {
-        translation -0.05800000876483282 3.5794356512715315e-05 0.00012370824652844288
+        translation -0.05800000876483282 3.5794356512714556e-05 0.00012370824652844272
         rotation -0.11855268117417309 -0.9858564818402736 0.1184578363804314 1.584241277159884
         children [
           DEF wheel_right Shape {
@@ -1122,8 +1094,6 @@ Robot {
         boundingObject USE wheel_right
         physics DEF Physics_wh Physics {
         }
-        linearVelocity 2.084243125367205e-13 -4.466895345268619e-12 5.653471338188544e-09
-        angularVelocity 1.1304062943575168e-10 -6.099936205848172e-11 1.8665562002775384e-11
       }
     }
     DEF Body1 Shape {
@@ -1141,8 +1111,6 @@ Robot {
   }
   controller "pyController"
   synchronization FALSE
-  linearVelocity -1.2993420444046244e-12 -2.417536819319425e-12 5.652983995437703e-09
-  angularVelocity -2.8024062830019997e-11 1.4990086696567455e-11 1.8659379638293913e-11
 }
 Robot {
   translation -0.5 -0.23 0.06
