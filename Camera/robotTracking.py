@@ -1,6 +1,9 @@
+from turtle import position
 import cv2 as cv
 import numpy as np
 import math
+
+import paho.mqtt.client as mqtt
 
 video = 1
 
@@ -14,9 +17,50 @@ lower_green_hsv =  np.array([42,50,50])
 upper_green_hsv =  np.array([75,255,255])
 
 MAX_DISTANCE = 150 #change if camera distance is increased/decreased
-RESOLUTION = (800, 450)
+# RESOLUTION = (800, 450)
+RESOLUTION = (1280, 720)
 
 robots = []
+
+
+broker = '145.24.222.37'
+port = 8005
+# generate client ID with pub prefix randomly
+client_id = f'TrackingClient1'
+username = 'robots'
+password = 'robots'
+
+
+def connect_mqtt():
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT")
+        else:
+            print("Failed to connect to MQTT")
+    #Set Connecting Client ID
+    client = mqtt.Client(client_id)
+    client.username_pw_set(username, password)
+    client.on_connect = on_connect
+    client.connect(broker,port)
+    return client
+
+def sendPostition(client, robotID):
+    topic = f"robots/toServer/{robotID}/position"
+    pos = 5
+    publishMqtt(client, topic, pos)
+
+def sendHeading(client, robotID):
+    topic = f"robots/toServer/{robotID}/heading"
+    heading = 180
+    publishMqtt(client, topic, heading)
+
+def publishMqtt(client, topic, msg):
+    result = client.publish(topic, msg)
+    status = result[0]
+    if status == 0:
+        print(f"Send `{msg}` to topic `{topic}`")
+    else:
+        print(f"Failed to send message to topic {topic}")
 
 class Robot:
     def __init__(self, redPos, greenPos):
@@ -144,10 +188,15 @@ def getCenterOfTwoPoints(p1, p2):
 
 if(video):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
-    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
+    # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
+    cap = cv.VideoCapture(0)
     firstFrame = True
 
+    client = connect_mqtt()
     while(1):
+        client.loop_start()
+        sendHeading(client, "robot0")
+
         _, frame = cap.read()
 
         frame = cv.resize(frame, RESOLUTION)
