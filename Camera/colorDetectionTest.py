@@ -21,9 +21,13 @@ class Robot:
     def __init__(self, redPos, greenPos):
         self.redPos = redPos
         self.greenPos = greenPos
-        self.gridPos = -1 #unknown?
+        self.gridPos = 0 #unknown?
         self.heading = -1 #unknown?
         self.center = getCenterOfTwoPoints(redPos, greenPos)
+    
+    def drawSelf(self, imgOut):
+        cv.circle(imgOut, self.center, 5, (0, 255, 255), cv.FILLED)
+        cv.line(imgOut, self.greenPos, self.redPos, (0, 255, 255), 2)
 
 
 class Grid():
@@ -152,7 +156,6 @@ if(video):
         redMasked = cv.bitwise_and(frame, frame, mask = (mask+mask2))
         greenMasked = cv.bitwise_and(frame, frame, mask = (mask3))
         
-
         redPositions = getContours(output, redMasked, "red")
         greenPositions = getContours(output, greenMasked, "green")
 
@@ -174,8 +177,6 @@ if(video):
                 for greenPos in greenPositions:
                     distance = distBetweenPoints(greenPos, redPos)
                     distancesAndPoints.append((redPos, greenPos, distance))
-                    
-            cv.line(output, greenPositions[0], redPositions[0], (0, 255, 255), 2)
 
             #create robot objects
             #in this stage it is important that the robots are spaced far enough apart from each other!
@@ -184,6 +185,9 @@ if(video):
             if firstFrame:
                 firstFrame = False
                 initRobots(distancesAndPoints, robotAmount)
+                for robot in robots:
+                    robot.drawSelf(output)
+                drawGrid(output)
             else:
                 ctr = updateRobots(distancesAndPoints)
 
