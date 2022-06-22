@@ -62,44 +62,7 @@ def objPositionOnGrid(xPos, yPos):
     gridPosX = int(xPos / grid.width)
     gridPosY = int(yPos / grid.height)
     gridNum = gridPosX + (gridPosY * grid.xGridSize)
-
-    print(f"grX: {gridPosX}, grY: {gridPosY}, grNum: {gridNum}")
-    cv.circle(output, (xPos, yPos), 10, (0,255,255), cv.FILLED)
-
-    drawGrid(output)
-
-def drawCircles(img, name):
-    # coords = cv.findNonZero(mask)
-    # for coord in coords:
-    #     cv.circle(img, coord[0], 100, (0,0,255), 10)
-    
-    # convert the image to grayscale
-    gray_image = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-    # convert the grayscale image to binary image
-    ret,thresh = cv.threshold(gray_image,127,255,0)
-
-    # find contours in the binary image
-    contours, hierarchy = cv.findContours(thresh,cv.RETR_TREE,cv.CHAIN_APPROX_SIMPLE)
-    for c in contours:
-    # calculate moments for each contour
-        M = cv.moments(c)
-
-        # calculate x,y coordinate of center
-        if M["m00"] != 0:
-            cX = int(M["m10"] / M["m00"])
-            cY = int(M["m01"] / M["m00"])
-        else:
-            cX, cY = 0, 0
-
-        # put text and highlight the center
-        #cv.circle(img, (50, 50), 500, (0, 0, 255), 15)
-        #cv.putText(img, name, (cX - 25, cY - 25),cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 255, 255), 2)
-        cv.circle(img, (cX, cY), 5, (255, 0, 0), 10)
-        cv.putText(img, "centroid", (cX - 25, cY - 25),cv.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-
-        # display the image
-        #cv.imshow("Image", img)
-        #cv.waitKey(30000)
+    return gridNum
 
 
 def getContours(originalImg, contourImg, color):
@@ -172,7 +135,8 @@ def getCenterOfTwoPoints(p1, p2):
 
 
 if(video):
-    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
+    # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
+    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     firstFrame = True
     while(1):
         _, frame = cap.read()
