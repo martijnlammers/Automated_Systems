@@ -25,11 +25,15 @@ class Robot:
         self.gridPos = 0 #unknown?
         self.heading = -1 #unknown?
         self.center = getCenterOfTwoPoints(redPos, greenPos)
+        self.angleOffset = -30
+        self.heading = 0
     
     def drawSelf(self, imgOut):
         cv.circle(imgOut, self.center, 5, (0, 255, 255), cv.FILLED)
         cv.line(imgOut, self.greenPos, self.redPos, (0, 255, 255), 2)
-
+    
+    def findHeading(self):
+        self.heading = int((findAngleBetweenPoints(self.greenPos, self.redPos) + self.angleOffset)  % 360)
 
 class Grid():
 
@@ -56,6 +60,12 @@ class Grid():
                 cv.putText(img, f"{gridCounter}", (int(gridX - (self.width/1.2)), int(gridY - (self.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
                 gridCounter += 1
 
+def findAngleBetweenPoints(p1, p2):
+    deltaX = p1[0] - p2[0]
+    deltaY = p2[1] - p1[1]
+    
+    return (math.degrees(math.atan2(deltaX, deltaY)) + 180) % 360
+
 def getContours(originalImg, contourImg, color):
     posArray = []
     gray_image = cv.cvtColor(contourImg, cv.COLOR_BGR2GRAY)
@@ -80,10 +90,10 @@ def getContours(originalImg, contourImg, color):
                 midpoint = (round(M['m10'] / M['m00']), round(M['m01'] / M['m00']))
                 if midpoint not in posArray:
                     if color == "red":
-                        cv.circle(originalImg, midpoint, 4, (0, 255, 0), -1)
+                        cv.circle(originalImg, midpoint, 4, (0, 0, 255), -1)
                         posArray.append(midpoint)
                     elif color == "green":
-                        cv.circle(originalImg, midpoint, 4, (0, 0, 255), -1)
+                        cv.circle(originalImg, midpoint, 4, (0, 255, ), -1)
                         posArray.append(midpoint)
     if posArray is None:
         return list()
@@ -113,6 +123,9 @@ def updateRobot(robot, distanceAndPoints):
     robot.center = closestCenter
     robot.redPos = newRedPos
     robot.greenPos = newGreenPos
+
+    # get the heading
+    robot.findHeading()
 
 def distBetweenPoints(p1, p2):
     return math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))
