@@ -124,27 +124,29 @@ void succesfullRegistered(const String& payload) //MQTT Connection
 
 void readI2C()
 {
-  Wire.requestFrom(arduinoAdress,2);
+  Wire.requestFrom(arduinoAdress,3);
 
   while(Wire.available())
   {
     byte ldrValue = Wire.read();
     if(ldrValue > 250) goalDetected = true;
     if(goalDetected && ldrValue < 250) goalDetected = false;
-    
-//    Serial.print("ldr:");
-//    Serial.print(ldrValue);
-//    Serial.print("\t");
-//    Serial.print("ir:");
-    
-    byte irValueDown = Wire.read();   // is 1 if no obstacle
-    byte irValueFront = Wire.read();  // is 0 if no robot
+
+    byte irValueDown = Wire.read();   // is 0 if obstacle
+    byte irValueFront = Wire.read();  // is 1 if robot
     if(!irValueDown) obstacleDetected = true;
     if(irValueFront) robotDetected = true;
     if(obstacleDetected && irValueDown) obstacleDetected = false;
     if(robotDetected && !irValueFront) robotDetected = false;
     
-//    Serial.println(irValue*100);
+//    Serial.print("ldr:");
+//    Serial.print(ldrValue);
+//    Serial.print("\t");
+//    Serial.print("irDown:");
+//    Serial.print(irValueDown);
+//    Serial.print("\t");
+//    Serial.print("irFront:");
+//    Serial.println(irValueFront);
 
     lastReadTime = millis();
   }
