@@ -68,7 +68,6 @@ def objPositionOnGrid(xPos, yPos):
     gridNum = gridPosX + (gridPosY * grid.xGridSize)
     return gridNum
 
-
 def getContours(originalImg, contourImg, color):
     posArray = []
     gray_image = cv.cvtColor(contourImg, cv.COLOR_BGR2GRAY)
@@ -82,14 +81,13 @@ def getContours(originalImg, contourImg, color):
     for index, contour in enumerate(contours):
         if cv.contourArea(contour) > 60:
             goodContours.append(index)
-
     
     # Calculate image moments of the detected contour
         for i in goodContours:
             M = cv.moments(contours[i])
             cv.drawContours(originalImg, contours, i, (255, 0, 0), 2)
             
-        # Draw a circle based centered at centroid coordinates
+        # Draw a circle based centered at centroid coordinates and color
             if M["m00"] != 0:
                 midpoint = (round(M['m10'] / M['m00']), round(M['m01'] / M['m00']))
                 if midpoint not in posArray:
@@ -109,6 +107,7 @@ def initRobots(distancesAndPoints, robotAmount):
     for i in range(robotAmount):
         robots.append(Robot(distancesAndPoints[i][0], distancesAndPoints[i][1]))
 
+# Updates position of a robot
 def updateRobot(robot, distanceAndPoints):
     distToClosestCenter = 9999
     closestCenter = (0,0)
@@ -129,7 +128,6 @@ def updateRobot(robot, distanceAndPoints):
 
 def distBetweenPoints(p1, p2):
     return math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))
-        
 
 def getCenterOfTwoPoints(p1, p2):
     width = abs(p1[0] - p2[0])
@@ -147,34 +145,26 @@ if(video):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
     cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     firstFrame = True
+
     while(1):
         _, frame = cap.read()
 
         frame = cv.resize(frame, (800, 450))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
+        # Get masks of red and green
         mask = cv.inRange(hsv, lower_hsv, upper_hsv)
         mask2 = cv.inRange(hsv, lower_hsv2, upper_hsv2)
         mask3 = cv.inRange(hsv, lower_green_hsv, upper_green_hsv)
 
-        output = cv.bitwise_and(frame, frame, mask = (mask+mask2+mask3))
+        processedImg = cv.bitwise_and(frame, frame, mask = (mask+mask2+mask3))
         redMasked = cv.bitwise_and(frame, frame, mask = (mask+mask2))
         greenMasked = cv.bitwise_and(frame, frame, mask = (mask3))
         
-        redPositions = getContours(output, redMasked, "red")
-        greenPositions = getContours(output, greenMasked, "green")
-
-        #creating robot objects TODO:
-        #get all positions of red and green contours
-        #sort them based on distance (distance should roughly be the same each time and for each pair)
-        #create a robot instance for each pair of red/green objects
+        redPositions = getContours(processedImg, redMasked, "red")
+        greenPositions = getContours(processedImg, greenMasked, "green")
         
-        #updating robot object locations and variables TODO:
-        #get all positions of red/green contours
-        #get the positions that are closest to the previous positions, this is the location of the new position
-
-        #!!!CENTER OF THE TWO POINTS CLOSEST TO THE PREVIOUS CENTER WILL BE THE NEW POINTS
-        
+        # Get all positions and distances of red and green contours
         distancesAndPoints = []
 
         if greenPositions and redPositions:
@@ -183,36 +173,37 @@ if(video):
                     distance = distBetweenPoints(greenPos, redPos)
                     distancesAndPoints.append((redPos, greenPos, distance))
 
-            #create robot objects
-            #in this stage it is important that the robots are spaced far enough apart from each other!
             robotAmount = min(len(greenPositions), len(redPositions))
-        
+
+            # Initialize or update the robots with their positions
             if firstFrame:
                 firstFrame = False
                 initRobots(distancesAndPoints, robotAmount)
                 for robot in robots:
-                    robot.drawSelf(output)
-                drawGrid(output)
+                    robot.drawSelf(processedImg)
+                drawGrid(processedImg)
             else:
-                drawGrid(output)
+                drawGrid(processedImg)
                 for robot in robots:
                     updateRobot(robot, distancesAndPoints)
 
                     gridPos = objPositionOnGrid(robot.center[0], robot.center[1])
                     robot.gridPos = gridPos
-                    robot.drawSelf(output)
+                    robot.drawSelf(processedImg)
         
         cv.imshow("frame", frame)
-        cv.imshow("output", output)
+        cv.imshow("output", processedImg)
 
+        # Press 'escape' to quit
         k = cv.waitKey(1) & 0xff
         if k == 27 : break
 
 
     cap.release()
-    output.release()
+    processedImg.release()
     cv.destroyAllWindows()
 
+# Code to test with one image delete in final code
 else:
     frame = cv.imread("C:\\Users\\rtsmo\\Downloads\\colorTest.png")
     frame = cv.resize(frame, (1200, 675))
@@ -223,16 +214,16 @@ else:
     mask3 = cv.inRange(hsv, lower_green_hsv, upper_green_hsv)
     allMask = (mask+mask2+mask3)
 
-    output = cv.bitwise_and(frame, frame, mask = mask3)
+    processedImg = cv.bitwise_and(frame, frame, mask = mask3)
 
     thresh_img = cv.threshold(mask2, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
 
     cnts = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
     cnts = cnts[0] if len(cnts) == 2 else cnts[1]
 
-    getContours(frame, output)
+    getContours(frame, processedImg)
 
     cv.imshow("frame", frame)
-    cv.imshow("output", output)
+    cv.imshow("output", processedImg)
     cv.imshow("countours", thresh_img)
     cv.waitKey(0)
