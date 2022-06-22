@@ -72,7 +72,7 @@ class Robot:
     def findHeading(self):
         self.heading = int((findAngleBetweenPoints(self.greenPos, self.redPos) + self.angleOffset)  % 360)
 
-    def sendPostition(self, client):
+    def sendPosition(self, client):
         topic = f"robots/toServer/{self.robotID}/position"
         publishMqtt(client, topic, self.gridPos)
 
@@ -197,13 +197,13 @@ def linkRobotIdToRobot(robotID):
 if(video):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
-    cap = cv.VideoCapture(0)
+    cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
+    # cap = cv.VideoCapture(0)
     firstFrame = True
 
     client = connect_mqtt()
     while(1):
         client.loop_start()
-        sendHeading(client, "robot0")
 
         _, frame = cap.read()
 
@@ -250,6 +250,8 @@ if(video):
                     gridPos = grid.positionOnGrid(robot.center[0], robot.center[1])
                     robot.gridPos = gridPos
                     robot.drawSelf(processedImg)
+                    robot.sendPosition(client)
+                    robot.sendHeading(client)
         
         cv.imshow("frame", frame)
         cv.imshow("output", processedImg)
