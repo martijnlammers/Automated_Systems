@@ -20,6 +20,8 @@ MAX_DISTANCE = 150 #change if camera distance is increased/decreased
 # RESOLUTION = (800, 450)
 RESOLUTION = (1280, 720)
 
+robotsStopped = True
+
 robots = []
 
 
@@ -64,10 +66,11 @@ def publishMqtt(client, topic, msg):
 
 class Robot:
     def __init__(self, redPos, greenPos):
+        self.robotID = None
         self.redPos = redPos
         self.greenPos = greenPos
-        self.gridPos = 0 #unknown?
-        self.heading = -1 #unknown?
+        self.gridPos = 0
+        self.heading = 0
         self.center = getCenterOfTwoPoints(redPos, greenPos)
         self.angleOffset = -30
         self.heading = 0
@@ -184,6 +187,13 @@ def getCenterOfTwoPoints(p1, p2):
     cX = int(xLeft + (width/2))
     cY = int(yTop + (height/2))
     return cX, cY
+
+def linkRobotIdToRobot(robotID):
+    if robotsStopped:
+        for robot in robots:
+            pass
+            #if heading in past 10? frames changed by more than X degrees:
+                #robot.robotID = robotID
 
 
 if(video):
