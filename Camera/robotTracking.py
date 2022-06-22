@@ -46,16 +46,6 @@ def connect_mqtt():
     client.connect(broker,port)
     return client
 
-def sendPostition(client, robotID):
-    topic = f"robots/toServer/{robotID}/position"
-    pos = 5
-    publishMqtt(client, topic, pos)
-
-def sendHeading(client, robotID):
-    topic = f"robots/toServer/{robotID}/heading"
-    heading = 180
-    publishMqtt(client, topic, heading)
-
 def publishMqtt(client, topic, msg):
     result = client.publish(topic, msg)
     status = result[0]
@@ -69,11 +59,17 @@ class Robot:
         self.robotID = None
         self.redPos = redPos
         self.greenPos = greenPos
+<<<<<<< Updated upstream
         self.gridPos = 0
         self.heading = 0
+=======
+        self.gridPos = 0 #unknown?
+        self.heading = -1 #unknown?             #??? 2x
+>>>>>>> Stashed changes
         self.center = getCenterOfTwoPoints(redPos, greenPos)
         self.angleOffset = -30
         self.heading = 0
+        self.robotID = "testID"
     
     def drawSelf(self, imgOut):
         cv.circle(imgOut, self.center, 5, (0, 255, 255), cv.FILLED)
@@ -81,6 +77,14 @@ class Robot:
     
     def findHeading(self):
         self.heading = int((findAngleBetweenPoints(self.greenPos, self.redPos) + self.angleOffset)  % 360)
+
+    def sendPostition(self, client):
+        topic = f"robots/toServer/{self.robotID}/position"
+        publishMqtt(client, topic, self.gridPos)
+
+    def sendHeading(self, client):
+        topic = f"robots/toServer/{self.robotID}/heading"
+        publishMqtt(client, topic, self.heading)
 
 class Grid():
 
