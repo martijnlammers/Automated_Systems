@@ -14,6 +14,7 @@ lower_green_hsv =  np.array([42,50,50])
 upper_green_hsv =  np.array([75,255,255])
 
 MAX_DISTANCE = 150 #change if camera distance is increased/decreased
+RESOLUTION = (800, 450)
 
 robots = []
 
@@ -58,7 +59,7 @@ class Grid():
 def getContours(originalImg, contourImg, color):
     posArray = []
     gray_image = cv.cvtColor(contourImg, cv.COLOR_BGR2GRAY)
-    ret, thresh = cv.threshold(gray_image, 50, 255, cv.THRESH_BINARY)
+    _, thresh = cv.threshold(gray_image, 50, 255, cv.THRESH_BINARY)
 
     #find contours
     contours, hierarchy = cv.findContours(thresh, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)
@@ -136,7 +137,7 @@ if(video):
     while(1):
         _, frame = cap.read()
 
-        frame = cv.resize(frame, (800, 450))
+        frame = cv.resize(frame, RESOLUTION)
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         # Get masks of red and green
@@ -195,7 +196,7 @@ if(video):
 # Code to test with one image delete in final code
 else:
     frame = cv.imread("C:\\Users\\rtsmo\\Downloads\\colorTest.png")
-    frame = cv.resize(frame, (1200, 675))
+    frame = cv.resize(frame, RESOLUTION)
     hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
     mask = cv.inRange(hsv, lower_hsv, upper_hsv)
