@@ -7,13 +7,13 @@ video = 1
 lower_hsv = np.array([0,50,50])
 upper_hsv = np.array([4,255,255])
 
-lower_hsv2 =  np.array([176,50,50])
+lower_hsv2 =  np.array([170,50,50])
 upper_hsv2 =  np.array([179,255,255])
 
-lower_green_hsv =  np.array([45,50,50])
-upper_green_hsv =  np.array([70,255,255])
+lower_green_hsv =  np.array([42,50,50])
+upper_green_hsv =  np.array([75,255,255])
 
-MAX_DISTANCE = 100 #change if camera distance is increased/decreased
+MAX_DISTANCE = 150 #change if camera distance is increased/decreased
 
 robots = []
 
@@ -113,13 +113,13 @@ def getContours(originalImg, contourImg, color):
     #remove small contours
     goodContours = []
     for index, contour in enumerate(contours):
-        if cv.contourArea(contour) > 150:
+        if cv.contourArea(contour) > 60:
             goodContours.append(index)
 
     
     # Calculate image moments of the detected contour
         for i in goodContours:
-            M = cv.moments(contours[i])        
+            M = cv.moments(contours[i])
             cv.drawContours(originalImg, contours, i, (255, 0, 0), 2)
             
         # Draw a circle based centered at centroid coordinates
@@ -177,7 +177,7 @@ if(video):
     while(1):
         _, frame = cap.read()
 
-        frame = cv.resize(frame, (450, 800))
+        frame = cv.resize(frame, (800, 450))
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
 
         mask = cv.inRange(hsv, lower_hsv, upper_hsv)
