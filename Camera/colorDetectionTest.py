@@ -109,19 +109,24 @@ def initRobots(distancesAndPoints, robotAmount):
     for i in range(robotAmount):
         robots.append(Robot(distancesAndPoints[i][0], distancesAndPoints[i][1]))
 
-def updateRobots(distanceAndPoints):
-    for robot in robots:
-        distToClosestCenter = 9999
-        closestCenter = (0,0)
-        for redPos, greenPos, distance in distanceAndPoints:
-            currentCenter = getCenterOfTwoPoints(redPos, greenPos)
-            distanceBetweenCenters = distBetweenPoints(robot.center, currentCenter)
-            if distanceBetweenCenters < distToClosestCenter and distance < MAX_DISTANCE:
-                closestCenter = currentCenter
-                distToClosestCenter = distanceBetweenCenters
-        robot.center = closestCenter
-        #TODO: TEST
-            
+def updateRobot(robot, distanceAndPoints):
+    distToClosestCenter = 9999
+    closestCenter = (0,0)
+    newRedPos = newGreenPos = (0,0)
+    for redPos, greenPos, distance in distanceAndPoints:
+        currentCenter = getCenterOfTwoPoints(redPos, greenPos)
+        distanceBetweenCenters = distBetweenPoints(robot.center, currentCenter)
+        # print(f"robot center: {robot.center}, current:{currentCenter}, {distanceBetweenCenters}, {distance}")
+        
+        if distanceBetweenCenters < distToClosestCenter and distance < MAX_DISTANCE:
+            closestCenter = currentCenter
+            newRedPos = redPos
+            newGreenPos = greenPos
+            distToClosestCenter = distanceBetweenCenters
+    robot.center = closestCenter
+    robot.redPos = newRedPos
+    robot.greenPos = newGreenPos
+
 def distBetweenPoints(p1, p2):
     return math.sqrt(((p1[0]-p2[0])**2)+((p1[1]-p2[1])**2))
         
@@ -189,12 +194,14 @@ if(video):
                     robot.drawSelf(output)
                 drawGrid(output)
             else:
-                ctr = updateRobots(distancesAndPoints)
+                drawGrid(output)
+                for robot in robots:
+                    updateRobot(robot, distancesAndPoints)
 
-        drawGrid(output)
-        for robot in robots:
-            objPositionOnGrid(robot.center[0], robot.center[1])
-
+                    gridPos = objPositionOnGrid(robot.center[0], robot.center[1])
+                    robot.gridPos = gridPos
+                    robot.drawSelf(output)
+        
         cv.imshow("frame", frame)
         cv.imshow("output", output)
 
