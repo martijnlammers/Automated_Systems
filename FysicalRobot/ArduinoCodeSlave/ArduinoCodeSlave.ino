@@ -8,7 +8,8 @@ const int irPin2 = 3;
 byte ldrValue = 0;
 int ldrValueAVG = 0;
 int ldrValueCNT = 0;
-byte irValue = 0;
+byte irValueDown = 0;
+byte irValueFront = 0;
 
 void setup()
 {
@@ -21,8 +22,8 @@ void setup()
 void loop()
 {
   ldrValue = analogRead(ldrPin);
-  if(!digitalRead(irPin) || !digitalRead(irPin2)) irValue = 1;
-  else irValue = 0;
+  irValueDown = !digitalRead(irPin);
+  irValueFront = !digitalRead(irPin2);
   if(ldrValue > 4)
   {
     ldrValueAVG += ldrValue;
@@ -34,21 +35,18 @@ void loop()
 void requestEvent()
 {
   byte ldrSendValue = ldrValueAVG / ldrValueCNT;
-
-//  Serial.print("ldrSendValue:");
-//  Serial.print(ldrSendValue);
-//  Serial.print("ldrValueAVG:");
-//  Serial.print(ldrValueAVG);
-//  Serial.print("ldrValueCNT:");
-//  Serial.println(ldrValueCNT);
   
   Wire.write(ldrSendValue);
-  Wire.write(irValue);
+  Wire.write(irValueDown);
+  Wire.write(irValueFront);
   Serial.print("ldr:");
   Serial.print(ldrSendValue);
   Serial.print("\t");
-  Serial.print("ir:");
-  Serial.println(irValue*100);
+  Serial.print("irDown:");
+  Serial.print(irValueDown*100);
+  Serial.print("\t");
+  Serial.print("irFront:");
+  Serial.println(irValueFront*100);
   
   ldrValueAVG = 0;
   ldrValueCNT = 0;

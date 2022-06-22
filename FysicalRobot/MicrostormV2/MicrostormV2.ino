@@ -26,8 +26,10 @@ unsigned long lastReadTime;
 int nextReadTime = 100;
 bool goalDetected = false;
 bool obstacleDetected = false;
+bool robotDetected = false;
 bool goalDetectedSend = false;
 bool obstacleDetectedSend = false;
+bool robotDetectedSend = false;
 
 int motorChannel1 = 0;
 int motorChannel2 = 1;
@@ -80,8 +82,14 @@ void loop()
   }
   if(obstacleDetected && obstacleDetectedSend == false)
   {
-    client.publish("robots/toServer/" +robotId+ "/obstacleDetected", "[1,0,0,0]");  //[1,0,0,0] for sending that 
+    client.publish("robots/toServer/" +robotId+ "/obstacleDetected", "1,0,0,0");  //[1,0,0,0] for sending that 
     obstacleDetectedSend = true;
+    setMotorSpeed(0);
+  }
+  if(robotDetected && robotDetectedSend == false)
+  {
+    client.publish("robots/toServer/" +robotId+ "/robotDetected", "1,0,0,0");  //[1,0,0,0] for sending that 
+    robotDetectedSend = true;
     setMotorSpeed(0);
   }
   
@@ -129,9 +137,12 @@ void readI2C()
 //    Serial.print("\t");
 //    Serial.print("ir:");
     
-    byte irValue = Wire.read();
-    if(irValue) obstacleDetected = true;
-    if(obstacleDetected && !irValue) obstacleDetected = false;
+    byte irValueDown = Wire.read();   // is 1 if no obstacle
+    byte irValueFront = Wire.read();  // is 0 if no robot
+    if(!irValueDown) obstacleDetected = true;
+    if(irValueFront) robotDetected = true;
+    if(obstacleDetected && irValueDown) obstacleDetected = false;
+    if(robotDetected && !irValueFront) robotDetected = false;
     
 //    Serial.println(irValue*100);
 
