@@ -59,16 +59,10 @@ class Robot:
         self.robotID = None
         self.redPos = redPos
         self.greenPos = greenPos
-<<<<<<< Updated upstream
         self.gridPos = 0
         self.heading = 0
-=======
-        self.gridPos = 0 #unknown?
-        self.heading = -1 #unknown?             #??? 2x
->>>>>>> Stashed changes
         self.center = getCenterOfTwoPoints(redPos, greenPos)
         self.angleOffset = -30
-        self.heading = 0
         self.robotID = "testID"
     
     def drawSelf(self, imgOut):
