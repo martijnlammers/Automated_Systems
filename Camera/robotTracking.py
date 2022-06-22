@@ -82,8 +82,8 @@ class Robot:
 
 class Grid():
 
-    # Default grid is 10x10 in size
-    def __init__(self, frame, xGridSize = 10, yGridSize = 10):
+    # Default grid is 12x12 in size
+    def __init__(self, frame, xGridSize = 12, yGridSize = 12):
         self.xGridSize = xGridSize
         self.yGridSize = yGridSize
         self.frameHeight, self.frameWidth, _ = frame.shape
@@ -198,7 +198,7 @@ if(video):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
-    # cap = cv.VideoCapture(0)
+    # cap = cv.VideoCapture(1)
     firstFrame = True
 
     client = connect_mqtt()
