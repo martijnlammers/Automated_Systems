@@ -32,7 +32,6 @@ client_id = f'TrackingClient1'
 username = 'robots'
 password = 'robots'
 
-
 def connect_mqtt():
     def on_connect(client, userdata, flags, rc):
         if rc == 0:
@@ -46,13 +45,29 @@ def connect_mqtt():
     client.connect(broker,port)
     return client
 
-def publishMqtt(client, topic, msg):
+def publishMQTT(client, topic, msg):
     result = client.publish(topic, msg)
     status = result[0]
     if status == 0:
         print(f"Send `{msg}` to topic `{topic}`")
     else:
         print(f"Failed to send message to topic {topic}")
+
+def subscribeMQTT(client: mqtt):
+    def on_message(client, userdata, msg):
+        text = msg.payload.decode()
+        robotID = msg.topic # pick robotID from topic
+        print(f"Received `{text}` from `{msg.topic}` topic")
+        robot = getRobot(robotID)
+        robot.sendHeading(client)
+
+    client.subscribe(f"robots/toServer/+/rotateAck")
+    client.on_message = on_message
+
+def getRobot(searchId):
+    for robot in robots:
+        if(robot.robotID == searchId):
+            return robot
 
 class Robot:
     def __init__(self, redPos, greenPos):
@@ -74,11 +89,11 @@ class Robot:
 
     def sendPosition(self, client):
         topic = f"robots/toServer/{self.robotID}/position"
-        publishMqtt(client, topic, self.gridPos)
+        publishMQTT(client, topic, self.gridPos)
 
     def sendHeading(self, client):
         topic = f"robots/toServer/{self.robotID}/heading"
-        publishMqtt(client, topic, self.heading)
+        publishMQTT(client, topic, self.heading)
 
 class Grid():
 
@@ -202,6 +217,7 @@ if(video):
     firstFrame = True
 
     client = connect_mqtt()
+    subscribeMQTT(client)
     while(1):
         client.loop_start()
 
