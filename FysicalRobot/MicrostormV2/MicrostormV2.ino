@@ -26,10 +26,10 @@ unsigned long lastReadTime;
 int nextReadTime = 100;
 bool goalDetected = false;
 bool obstacleDetected = false;
-bool robotDetected = false;
+//bool robotDetected = false;
 bool goalDetectedSend = false;
 bool obstacleDetectedSend = false;
-bool robotDetectedSend = false;
+//bool robotDetectedSend = false;
 
 int motorChannel1 = 0;
 int motorChannel2 = 1;
@@ -86,12 +86,12 @@ void loop()
     obstacleDetectedSend = true;
     setMotorSpeed(0);
   }
-  if(robotDetected && robotDetectedSend == false)
-  {
-    client.publish("robots/toServer/" +robotId+ "/robotDetected", "1,0,0,0");  //[1,0,0,0] for sending that 
-    robotDetectedSend = true;
-    setMotorSpeed(0);
-  }
+//  if(robotDetected && robotDetectedSend == false)
+//  {
+//    client.publish("robots/toServer/" +robotId+ "/robotDetected", "1,0,0,0");  //[1,0,0,0] for sending that 
+//    robotDetectedSend = true;
+//    setMotorSpeed(0);
+//  }
   
   if((millis()-startStepTime > totalStepTime) && stepDone == false)
   {
@@ -124,7 +124,7 @@ void succesfullRegistered(const String& payload) //MQTT Connection
 
 void readI2C()
 {
-  Wire.requestFrom(arduinoAdress,3);
+  Wire.requestFrom(arduinoAdress,2);
 
   while(Wire.available())
   {
@@ -133,12 +133,12 @@ void readI2C()
     if(goalDetected && ldrValue < 250) goalDetected = false;
 
     byte irValueDown = Wire.read();   // is 0 if obstacle
-    byte irValueFront = Wire.read();  // is 1 if robot
+//    byte irValueFront = Wire.read();  // is 1 if robot
     if(!irValueDown) obstacleDetected = true;
-    if(irValueFront) robotDetected = true;
+//    if(irValueFront) robotDetected = true;
     if(obstacleDetected && irValueDown) obstacleDetected = false;
-    if(robotDetected && !irValueFront) robotDetected = false;
-    
+//    if(robotDetected && !irValueFront) robotDetected = false;
+
 //    Serial.print("ldr:");
 //    Serial.print(ldrValue);
 //    Serial.print("\t");
