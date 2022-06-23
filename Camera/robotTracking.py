@@ -1,4 +1,3 @@
-from turtle import position
 import cv2 as cv
 import numpy as np
 import math
@@ -28,46 +27,9 @@ robots = []
 broker = '145.24.222.37'
 port = 8005
 # generate client ID with pub prefix randomly
-client_id = f'TrackingClient1'
+client_id = 'TrackingClient1'
 username = 'robots'
 password = 'robots'
-
-def connect_mqtt():
-    def on_connect(client, userdata, flags, rc):
-        if rc == 0:
-            print("Connected to MQTT")
-        else:
-            print("Failed to connect to MQTT")
-    #Set Connecting Client ID
-    client = mqtt.Client(client_id)
-    client.username_pw_set(username, password)
-    client.on_connect = on_connect
-    client.connect(broker,port)
-    return client
-
-def publishMQTT(client, topic, msg):
-    result = client.publish(topic, msg)
-    status = result[0]
-    if status == 0:
-        print(f"Send `{msg}` to topic `{topic}`")
-    else:
-        print(f"Failed to send message to topic {topic}")
-
-def subscribeMQTT(client: mqtt):
-    def on_message(client, userdata, msg):
-        text = msg.payload.decode()
-        robotID = msg.topic # pick robotID from topic
-        print(f"Received `{text}` from `{msg.topic}` topic")
-        robot = getRobot(robotID)
-        robot.sendHeading(client)
-
-    client.subscribe(f"robots/toServer/+/rotateAck")
-    client.on_message = on_message
-
-def getRobot(searchId):
-    for robot in robots:
-        if(robot.robotID == searchId):
-            return robot
 
 class Robot:
     def __init__(self, redPos, greenPos):
@@ -76,9 +38,9 @@ class Robot:
         self.greenPos = greenPos
         self.gridPos = 0
         self.heading = 0
+        self.avgHeading = 0     #this is the average heading of the past 10 frames
         self.center = getCenterOfTwoPoints(redPos, greenPos)
         self.angleOffset = -30
-        self.robotID = "testID"
     
     def drawSelf(self, imgOut):
         cv.circle(imgOut, self.center, 5, (0, 255, 255), cv.FILLED)
@@ -119,6 +81,43 @@ class Grid():
                 cv.rectangle(img, (gridX- self.width, gridY - self.height), (gridX, gridY), (0,255,0), 2)
                 cv.putText(img, f"{gridCounter}", (int(gridX - (self.width/1.2)), int(gridY - (self.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
                 gridCounter += 1
+
+def connect_mqtt():
+    def on_connect(client, userdata, flags, rc):
+        if rc == 0:
+            print("Connected to MQTT")
+        else:
+            print("Failed to connect to MQTT")
+    #Set Connecting Client ID
+    client = mqtt.Client(client_id)
+    client.username_pw_set(username, password)
+    client.on_connect = on_connect
+    client.connect(broker,port)
+    return client
+
+def publishMQTT(client, topic, msg):
+    result = client.publish(topic, msg)
+    status = result[0]
+    if status == 0:
+        print(f"Send `{msg}` to topic `{topic}`")
+    else:
+        print(f"Failed to send message to topic {topic}")
+
+def subscribeMQTT(client):
+    def on_message(client, userdata, msg):
+        text = msg.payload.decode()
+        robotID = msg.topic # pick robotID from topic
+        print(f"Received `{text}` from `{msg.topic}` topic")
+        robot = getRobot(robotID)
+        robot.sendHeading(client)
+
+    client.subscribe(f"robots/toServer/+/rotateAck")
+    client.on_message = on_message
+
+def getRobot(searchId):
+    for robot in robots:
+        if(robot.robotID == searchId):
+            return robot
 
 def findAngleBetweenPoints(p1, p2):
     deltaX = p1[0] - p2[0]
@@ -173,8 +172,7 @@ def updateRobot(robot, distanceAndPoints):
     for redPos, greenPos, distance in distanceAndPoints:
         currentCenter = getCenterOfTwoPoints(redPos, greenPos)
         distanceBetweenCenters = distBetweenPoints(robot.center, currentCenter)
-        # print(f"robot center: {robot.center}, current:{currentCenter}, {distanceBetweenCenters}, {distance}")
-        
+
         if distanceBetweenCenters < distToClosestCenter and distance < MAX_DISTANCE:
             closestCenter = currentCenter
             newRedPos = redPos
@@ -204,15 +202,15 @@ def getCenterOfTwoPoints(p1, p2):
 def linkRobotIdToRobot(robotID):
     if robotsStopped:
         for robot in robots:
-            pass
-            #if heading in past 10? frames changed by more than X degrees:
-                #robot.robotID = robotID
+            if robot.robotID is not None:
+                deltaTheta = min(robot.heading - (robot.avgHeading), 360 - (robot.heading - (robot.avgHeading)))
+                if abs(deltaTheta) > 3:
+                    robot.robotID = robotID
 
-
-if(video):
+def processVideo():
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
-    # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
-    cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
+    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
+    # cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
     # cap = cv.VideoCapture(1)
     firstFrame = True
 
@@ -281,27 +279,8 @@ if(video):
     processedImg.release()
     cv.destroyAllWindows()
 
-# Code to test with one image delete in final code
-else:
-    frame = cv.imread("C:\\Users\\rtsmo\\Downloads\\colorTest.png")
-    frame = cv.resize(frame, RESOLUTION)
-    hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
+def main():
+    processVideo()
 
-    mask = cv.inRange(hsv, lower_hsv, upper_hsv)
-    mask2 = cv.inRange(hsv, lower_hsv2, upper_hsv2)
-    mask3 = cv.inRange(hsv, lower_green_hsv, upper_green_hsv)
-    allMask = (mask+mask2+mask3)
-
-    processedImg = cv.bitwise_and(frame, frame, mask = mask3)
-
-    thresh_img = cv.threshold(mask2, 0, 255, cv.THRESH_BINARY + cv.THRESH_OTSU)[1]
-
-    cnts = cv.findContours(thresh_img, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE)
-    cnts = cnts[0] if len(cnts) == 2 else cnts[1]
-
-    getContours(frame, processedImg)
-
-    cv.imshow("frame", frame)
-    cv.imshow("output", processedImg)
-    cv.imshow("countours", thresh_img)
-    cv.waitKey(0)
+if __name__ == "__main__":
+    main()
