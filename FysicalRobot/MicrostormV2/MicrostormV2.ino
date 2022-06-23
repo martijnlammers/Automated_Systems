@@ -101,7 +101,7 @@ void loop()
     stepDone = true;
     setMotorSpeed(0);
     //send MQTT stopped
-    client.publish("robots/toServer/<robotId>/rotateAck", "true");
+    client.publish("robots/toServer/" +robotId+ "/rotateAck", "true");
   }
 }
 
