@@ -172,17 +172,15 @@ def moveToTarget(destination):
             motorStop()
             updateRobotData()
             path = []
+            publish(f"robots/toServer/{robotId}/robotDetected", "1,0,0,0")     
             time.sleep(0.5)
-            publish(f"robots/toServer/{robotId}/robotDetected", "1,0,0,0")        
             return        
         if(sensor_ground.getValue() == 1000):
             motorStop()
             updateRobotData()
             path = []
-            time.sleep(0.5)
             publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
             return
-        motorMoveForward()
         condition = (lengthToDestination > POS_MATCHING_ACC)
         r.step(TIME_STEP)
     if(not found_target and not obstacle):
@@ -232,8 +230,8 @@ def translateToNodeNumber(pos):
 def publish(topic, message):
     global robotId, client
     client.publish(topic, message, qos=2)
-    print(str(robotId) + " publishing to: " +
-          str(topic) + " message: " + str(message))
+    # print(str(robotId) + " publishing to: " +
+          # str(topic) + " message: " + str(message))
 def updateRobotData():
     publish("robots/toServer/" + robotId + "/position", str(translateToNodeNumber(gps_mid.getValues())))
     publish("robots/toServer/" + robotId + "/heading", getHeading())
@@ -247,7 +245,7 @@ def on_message(client, userdata, msg):
     global action_index, robotId, path, uuid, found_target
     action = str(msg.topic).split("/")[action_index]
     payload = str(msg.payload.decode("utf-8"))
-    print(action + " " + payload + " " + uuid)
+    # print(action + " " + payload + " " + uuid)
 
     if(action.__eq__("path")):
         path = []   
