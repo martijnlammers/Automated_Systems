@@ -46,7 +46,8 @@ class Robot:
         cv.line(imgOut, self.greenPos, self.redPos, (0, 255, 255), 2)
     
     def findHeading(self):
-        self.heading = int((findAngleBetweenPoints(self.greenPos, self.redPos) + self.angleOffset)  % 360)
+        self.prevHeading = self.heading
+        self.heading = int((findAngleBetweenPoints(self.greenPos, self.redPos) + self.angleOffset + 90)  % 360) 
 
     def sendPosition(self, client):
         topic = f"robots/toServer/{self.robotID}/position"
@@ -269,8 +270,10 @@ def processVideo():
                     if(newGridPos != robot.gridPos):
                         robot.gridPos = newGridPos
                         robot.sendPosition(client)
-                        robot.sendHeading(client)
                     robot.drawSelf(processedImg)
+
+                    if robot.heading != robot.prevHeading:
+                        robot.sendHeading(client)
                     
                     
         
