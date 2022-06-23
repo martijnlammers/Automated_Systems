@@ -11,7 +11,7 @@
 from controller import Robot, Motor, GPS, LightSensor, DistanceSensor, InertialUnit, Supervisor
 import math as m
 import paho.mqtt.client as mqtt
-import uuid
+import uuid, time
 
 # Constants
 
@@ -20,7 +20,7 @@ USERNAME, PASSWORD = "robots", "robots"
 
 TIME_STEP = 20
 ROTATE_SPEED, MAX_SPEED = 1, 4
-POS_CORRECTION = 3
+POS_CORRECTION = 5
 POS_MATCHING_ACC = 0.03
 ANGLE_ACCURACY = 1
 
@@ -154,7 +154,7 @@ def rotateToTarget(destination):
 
 
 def moveToTarget(destination):
-    global path, found_target, on_target_pos
+    global path, found_target, on_target_pos, client
     obstacle = False
     
     # The condition variable is used to
@@ -163,11 +163,24 @@ def moveToTarget(destination):
     
     condition = True
     motorMoveForward()
-    while(condition and not found_target and not obstacle):
+    while(condition):
         vectors = getVectors(destination)
         lengthToDestination = abs(m.sqrt(m.pow(vectors[0][0], 2) + m.pow(vectors[0][1], 2)))
-        found_target = True if (sensor_light.getValue() > 450) else False
-        obstacle = True if (sensor_ground.getValue() == 1000 or sensor_dist.getValue() < 400) else False
+        # found_target = True if (sensor_light.getValue() > 450) else False
+        # obstacle = True if (sensor_ground.getValue() == 1000 or sensor_dist.getValue() < 400) else False
+        if(sensor_dist.getValue() < 600):
+            motorStop()
+            updateRobotData()
+            path = []
+            publish(f"robots/toServer/{robotId}/robotDetected", "1,0,0,0")     
+            time.sleep(0.5)
+            return        
+        if(sensor_ground.getValue() == 1000):
+            motorStop()
+            updateRobotData()
+            path = []
+            publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
+            return
         condition = (lengthToDestination > POS_MATCHING_ACC)
         r.step(TIME_STEP)
     if(not found_target and not obstacle):
@@ -178,23 +191,16 @@ def moveToTarget(destination):
     # Sends location and heading to broker 
     # once completed with task.
     
-    publish("robots/toServer/" + robotId + "/position", str(translateToNodeNumber(gps_mid.getValues())))
-    publish("robots/toServer/" + robotId + "/heading", getHeading())
-    publish("robots/toServer/" + robotId + "/state", "NO_TASK")
-   
+    updateRobotData()
     if(found_target):
         path = []
         publish(f"robots/toServer/{robotId}/goalDetected", "true")
         
-    elif(obstacle):                                            # v Where the obstacle is found.
-        path = []                                              # v [North, East, South, West]         
-        publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
-  
 def moveRobot(node_number):
     global path, destination
     destination = translateToCoordinates(node_number)
     m_robotPos = gps_mid.getValues()
-    print(destination)
+    
     # Quits function when the destination equals the current position.
 
     if (m.fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC and
@@ -224,9 +230,12 @@ def translateToNodeNumber(pos):
 def publish(topic, message):
     global robotId, client
     client.publish(topic, message, qos=2)
-    print(str(robotId) + " publishing to: " +
-          str(topic) + " message: " + str(message))
-
+    # print(str(robotId) + " publishing to: " +
+          # str(topic) + " message: " + str(message))
+def updateRobotData():
+    publish("robots/toServer/" + robotId + "/position", str(translateToNodeNumber(gps_mid.getValues())))
+    publish("robots/toServer/" + robotId + "/heading", getHeading())
+    publish("robots/toServer/" + robotId + "/state", "NO_TASK")
 
 def on_connect(client, userdata, flags, rc):
     print("Robot connected successfully, response code: " + str(rc))
@@ -236,7 +245,7 @@ def on_message(client, userdata, msg):
     global action_index, robotId, path, uuid, found_target
     action = str(msg.topic).split("/")[action_index]
     payload = str(msg.payload.decode("utf-8"))
-    print(action + " " + payload + " " + uuid)
+    # print(action + " " + payload + " " + uuid)
 
     if(action.__eq__("path")):
         path = []   
@@ -282,9 +291,34 @@ if __name__ == "__main__":
     setupMQTT()
     while(r.step(TIME_STEP) != -1):
         client.loop()
+        # print(f"{robotId} {path}")
         if(len(path) > 0):
             dest = path.pop(0)
             moveRobot(dest)
+        # else:
+        #     client.publish("robots/toServer/{robotId}/getNextSet", "")
         r.step(TIME_STEP)
     # print(translateToNodeNumber(gps_mid.getValues()))
     # moveRobot(0)
+
+
+""" 
+robotDetected = false
+robotDetectedSend = false
+
+loop:
+    if(robotDetected && robotDetectedSend == false):
+        client.publish("robots/toServer/" +robotId+ "/robotDetected", "1,0,0,0")
+        robotDetectedSend = true
+        motorStop()  
+    
+    ReadIR()
+    
+subscribe toRobot/ID/drive => drive()
+subscribe toServer/ID/heading => changeHeading()
+
+ReadIR():
+    if(IR):
+        robotDetected = true
+
+"""
