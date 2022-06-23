@@ -66,7 +66,6 @@ class Grid():
 
         # offset in pixels depending on the distance and resolution of the camera
         self.pixelHeightOffset = 85
-        self.yOffset = self.pixelHeightOffset/2
 
         self.width = int(self.frameWidth/self.xGridSize) 
         self.height = int((self.frameHeight - self.pixelHeightOffset)/self.yGridSize)
