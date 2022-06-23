@@ -18,7 +18,7 @@ import uuid, time
 HOST, PORT = "145.24.222.37", 8005
 USERNAME, PASSWORD = "robots", "robots"
 
-TIME_STEP = 20
+TIME_STEP = 8
 ROTATE_SPEED, MAX_SPEED = 1, 4
 POS_CORRECTION = 5
 POS_MATCHING_ACC = 0.03
@@ -55,7 +55,6 @@ def setupRobot():
     motorStop()
 
 # Basic movement for the robot.
-
 
 def motorStop():
     motor_left.setVelocity(0)
@@ -166,8 +165,8 @@ def moveToTarget(destination):
     while(condition):
         vectors = getVectors(destination)
         lengthToDestination = abs(m.sqrt(m.pow(vectors[0][0], 2) + m.pow(vectors[0][1], 2)))
-        # found_target = True if (sensor_light.getValue() > 450) else False
-        # obstacle = True if (sensor_ground.getValue() == 1000 or sensor_dist.getValue() < 400) else False
+ 
+        r.step(TIME_STEP)
         if(sensor_dist.getValue() < 600):
             motorStop()
             updateRobotData()
@@ -181,8 +180,13 @@ def moveToTarget(destination):
             path = []
             publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
             return
+        if(sensor_light.getValue() > 400):
+            motorStop()
+            updateRobotData()
+            path = []
+            publish(f"robots/toServer/{robotId}/goalDetected", "true")
+            return
         condition = (lengthToDestination > POS_MATCHING_ACC)
-        r.step(TIME_STEP)
     if(not found_target and not obstacle):
         for i in range(POS_CORRECTION):
             r.step(1)
@@ -218,11 +222,11 @@ def moveRobot(node_number):
 # Position translators will turn x,y coordinates in corresponding node number
 # and visa versa for server-robot interactions..
 def translateToCoordinates(node_nr):
-    return [((int(node_nr / 12)) * 0.2) - 0.0906478, ((node_nr % 12) * 0.2) + 0.0102571]
+    return [((int(node_nr / 6)) * 0.2) - 0.0906478, ((node_nr % 6) * 0.2) + 0.0102571]
 
 
 def translateToNodeNumber(pos):   
-    return((m.ceil((round(pos[0]  + 0.1084682, 1)) / 0.2) * 12) + 
+    return((m.ceil((round(pos[0]  + 0.1084682, 1)) / 0.2) * 6) + 
                 (m.ceil((round(pos[1] + 0.002948, 1)) / 0.2)))
 
 
@@ -239,7 +243,6 @@ def updateRobotData():
 
 def on_connect(client, userdata, flags, rc):
     print("Robot connected successfully, response code: " + str(rc))
-
 
 def on_message(client, userdata, msg):
     global action_index, robotId, path, uuid, found_target
@@ -293,8 +296,7 @@ if __name__ == "__main__":
         client.loop()
         # print(f"{robotId} {path}")
         if(len(path) > 0):
-            dest = path.pop(0)
-            moveRobot(dest)
+            moveRobot(path.pop(0))
         # else:
         #     client.publish("robots/toServer/{robotId}/getNextSet", "")
         r.step(TIME_STEP)

@@ -1,12 +1,11 @@
 #VRML_SIM R2022a utf8
 WorldInfo {
-  basicTimeStep 20
   optimalThreadCount 4
 }
 Viewpoint {
   fieldOfView 1.1
-  orientation 0.5070365759828523 -0.5024397562805025 -0.7003343500959913 4.405281249705935
-  position 0.8927417600212817 0.02944640277682753 2.4193068583937998
+  orientation 0.456995688384551 -0.47878411985002156 -0.7496137054359203 4.52919626830389
+  position 1.095928522956007 -0.7673400965412489 2.199470823507474
   exposure 0.7999999999999999
 }
 TexturedBackground {
@@ -291,7 +290,7 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation 2.07763 2.15628 0.0399427
+  translation 1.88992 1.00037 0.0385032
   rotation -0.010783395509874966 -0.0032476286477117824 0.9999365836339043 -0.11825530717958621
   children [
     InertialUnit {
@@ -496,7 +495,7 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058000008659390874 -8.890795570498123e-06 -2.005421054454845e-05
+        translation 0.058000008659390874 -8.89079557049771e-06 -2.0054210544546378e-05
         rotation 0.43753611873518505 0.7857671888983899 -0.4371865387370388 4.474373040690045
         children [
           DEF wheel_left Shape {
@@ -565,7 +564,7 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation -0.1096462747858475 1.2034730536184797 0.03998904468022648
+  translation -0.105026 0.983484 0.0399539
   rotation 0.007500854421878049 -0.008618302305983282 0.9999347288939936 0.021019912441818542
   children [
     InertialUnit {
@@ -770,7 +769,7 @@ Robot {
         }
       ]
       endPoint DEF wheel_left Solid {
-        translation 0.058000008659390874 5.717669754784289e-05 -3.4277145201610756e-06
+        translation 0.058000008659390874 5.7176697547842326e-05 -3.4277145201605335e-06
         rotation -0.04649445447066791 -0.9978376578852027 0.04645722989641215 1.5721618710386551
         children [
           DEF wheel_left Shape {
@@ -839,7 +838,7 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation 1.52228 0.40011 0.0387949
+  translation 1.48828 0.199012 0.0383985
   rotation 0.05941100309892998 -0.03456350180286254 0.9976350520375186 0.0300193
   children [
     InertialUnit {
@@ -1113,7 +1112,7 @@ Robot {
   synchronization FALSE
 }
 Robot {
-  translation 1.9 0.79 0.06
+  translation 2.1 0.4 0.06
   children [
     PointLight {
       attenuation 0 0 1
@@ -1137,16 +1136,16 @@ Robot {
   name "target"
 }
 Floor {
-  translation 1 1.1 0
+  translation 1 0.5 0
   name "floor(1)"
-  size 2.8 2.8
+  size 2.8 1.6
   tileSize 0.2 0.2
   appearance Parquetry {
     type "light strip"
   }
 }
 Floor {
-  translation 1 2.4 0.01
+  translation 1 1.2 0.01
   name "floor(2)"
   size 2.8 0.2
   tileSize 0.2 0.2
@@ -1162,36 +1161,35 @@ Floor {
   }
 }
 Floor {
-  translation 0.1 0.6 2e-05
+  translation 0.7 0.6 2e-05
   name "floor(7)"
-  size 0.6 0.2
+  size 0.2 0.2
   tileSize 0.2 0.2
   appearance Parquetry {
     colorOverride 0 0 0
   }
 }
 Floor {
-  translation 1.3 0.8 2e-05
+  translation 1.3 0.5 2e-05
   rotation 0 0 1 -1.5708
   name "floor(9)"
-  size 1 0.2
+  size 0.4 0.2
   tileSize 0.2 0.2
   appearance Parquetry {
     colorOverride 0 0 0
   }
 }
 Floor {
-  translation 0.3 1 2e-05
-  rotation 0 0 1 -1.5708
+  translation 0 0.4 2e-05
   name "floor(8)"
-  size 0.6 0.2
+  size 0.4 0.2
   tileSize 0.2 0.2
   appearance Parquetry {
     colorOverride 0 0 0
   }
 }
 Floor {
-  translation 1.5 1.4 2e-05
+  translation 1.9 0.6 2e-05
   name "floor(10)"
   size 0.6 0.2
   tileSize 0.2 0.2
@@ -1200,18 +1198,18 @@ Floor {
   }
 }
 Floor {
-  translation -0.3 1.1 0.01
+  translation -0.3 0.5 0.01
   rotation 0 0 1 -1.5708
   name "floor(4)"
-  size 2.4 0.2
+  size 1.2 0.2
   tileSize 0.2 0.2
   appearance NULL
 }
 Floor {
-  translation 2.3 1.1 0.01
+  translation 2.3 0.5 0.01
   rotation 0 0 1 -1.5708
   name "floor(5)"
-  size 2.4 0.2
+  size 1.2 0.2
   tileSize 0.2 0.2
   appearance NULL
 }
@@ -1221,7 +1219,4 @@ Floor {
   size 2.8 0.2
   tileSize 0.2 0.2
   appearance NULL
-}
-CeilingLight {
-  translation 0.46 1.67 2.4
 }
