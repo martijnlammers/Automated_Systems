@@ -37,7 +37,7 @@ class Robot:
         self.greenPos = greenPos
         self.gridPos = 0
         self.heading = 0
-        self.avgHeading = 0     #this is the average heading of the past 10 frames
+        self.prevHeading = 0     #this is the average heading of the past 10 frames
         self.center = getCenterOfTwoPoints(redPos, greenPos)
         self.angleOffset = -30
     
@@ -59,13 +59,18 @@ class Robot:
 class Grid():
 
     # Default grid is 12x12 in size
-    def __init__(self, frame, xGridSize = 12, yGridSize = 12):
+    def __init__(self, frame, xGridSize = 12, yGridSize = 6):
         self.xGridSize = xGridSize
         self.yGridSize = yGridSize
         self.frameHeight, self.frameWidth, _ = frame.shape
-        self.width = int(self.frameWidth/self.xGridSize)
-        self.height = int(self.frameHeight/self.yGridSize)
-    
+
+        # offset in pixels depending on the distance and resolution of the camera
+        self.pixelHeightOffset = 85
+        self.yOffset = self.pixelHeightOffset/2
+
+        self.width = int(self.frameWidth/self.xGridSize) 
+        self.height = int((self.frameHeight - self.pixelHeightOffset)/self.yGridSize)
+        
     def positionOnGrid(self, xPos, yPos):
         gridPosX = int(xPos / self.width)
         gridPosY = int(yPos / self.height)
@@ -75,9 +80,9 @@ class Grid():
     def draw(self, img):
         gridCounter = 0
 
-        for gridY in range(self.height, self.frameHeight, self.height-1):
-            for gridX in range(self.width, self.frameWidth, self.width-1):
-                cv.rectangle(img, (gridX- self.width, gridY - self.height), (gridX, gridY), (0,255,0), 2)
+        for gridY in range(self.height, self.frameHeight, self.height):
+            for gridX in range(self.width, self.frameWidth, self.width):
+                cv.rectangle(img, (gridX- self.width, gridY - self.height), (gridX, gridY), (0,255,0), 1)
                 cv.putText(img, f"{gridCounter}", (int(gridX - (self.width/1.2)), int(gridY - (self.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
                 gridCounter += 1
 
@@ -98,6 +103,7 @@ def publishMQTT(client, topic, msg):
     result = client.publish(topic, msg)
     status = result[0]
     if status == 0:
+        pass
         print(f"Send `{msg}` to topic `{topic}`")
     else:
         print(f"Failed to send message to topic {topic}")
@@ -202,7 +208,7 @@ def linkRobotIdToRobot(robotID):
     if robotsStopped:
         for robot in robots:
             if robot.robotID is not None:
-                deltaTheta = min(robot.heading - (robot.avgHeading), 360 - (robot.heading - (robot.avgHeading)))
+                deltaTheta = min(robot.heading - (robot.prevHeading), 360 - (robot.heading - (robot.prevHeading)))
                 if abs(deltaTheta) > 3:
                     robot.robotID = robotID
 
@@ -264,14 +270,16 @@ def processVideo():
                     if(newGridPos != robot.gridPos):
                         robot.gridPos = newGridPos
                         robot.sendPosition(client)
+                        robot.sendHeading(client)
                     robot.drawSelf(processedImg)
-                    robot.sendHeading(client)
+                    
+                    
         
         cv.imshow("frame", frame)
         cv.imshow("output", processedImg)
 
         # Press 'escape' to quit
-        k = cv.waitKey(1) & 0xff
+        k = cv.waitKey(0) & 0xff
         if k == 27 : break
 
 
