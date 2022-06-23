@@ -26,7 +26,6 @@ robots = []
 
 broker = '145.24.222.37'
 port = 8005
-# generate client ID with pub prefix randomly
 client_id = 'TrackingClient1'
 username = 'robots'
 password = 'robots'
@@ -211,7 +210,7 @@ def processVideo():
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
     cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     # cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
-    # cap = cv.VideoCapture(1)
+    # cap = cv.VideoCapture(1)      # External cam
     firstFrame = True
 
     client = connect_mqtt()
@@ -261,10 +260,11 @@ def processVideo():
                 for robot in robots:
                     updateRobot(robot, distancesAndPoints)
 
-                    gridPos = grid.positionOnGrid(robot.center[0], robot.center[1])
-                    robot.gridPos = gridPos
+                    newGridPos = grid.positionOnGrid(robot.center[0], robot.center[1])
+                    if(newGridPos != robot.gridPos):
+                        robot.gridPos = newGridPos
+                        robot.sendPosition(client)
                     robot.drawSelf(processedImg)
-                    robot.sendPosition(client)
                     robot.sendHeading(client)
         
         cv.imshow("frame", frame)
