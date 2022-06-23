@@ -22,6 +22,12 @@ RESOLUTION = (1280, 720)
 robotsStopped = True
 
 robots = []
+coordDict = {60:0,48:1,36:2,24:3,12:4,0:5,61:6,49:7,37:8,25:9,13:10,1:11,62:12,
+            50:13,38:14,26:15,14:16,2:17,63:18,51:19,39:20,27:21,15:22,3:23,64:24,
+            52:25,40:26,28:27,16:28,4:29,65:30,53:31,41:32,29:33,17:34,5:35,66:36,
+            54:37,42:38,30:39,18:40,6:41,67:42,55:43,43:44,31:45,19:46,7:47,68:48,
+            56:49,44:50,32:51,20:52,8:53,69:54,57:55,45:56,33:57,21:58,9:59,70:60,
+            58:61,46:62,34:63,22:64,10:65,71:66,59:67,47:68,35:69,23:70,11:71}
 
 
 broker = '145.24.222.37'
@@ -75,7 +81,7 @@ class Grid():
         gridPosX = int(xPos / self.width)
         gridPosY = int(yPos / self.height)
         gridNum = gridPosX + (gridPosY * self.xGridSize)
-        return gridNum
+        return coordDict[gridNum]
 
     def draw(self, img):
         gridCounter = 0
@@ -83,7 +89,7 @@ class Grid():
         for gridY in range(self.height, self.frameHeight, self.height):
             for gridX in range(self.width, self.frameWidth, self.width):
                 cv.rectangle(img, (gridX- self.width, gridY - self.height), (gridX, gridY), (0,255,0), 1)
-                cv.putText(img, f"{gridCounter}", (int(gridX - (self.width/1.2)), int(gridY - (self.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
+                cv.putText(img, f"{coordDict[gridCounter]}", (int(gridX - (self.width/1.2)), int(gridY - (self.height/2))), cv.FONT_HERSHEY_SIMPLEX, 0.75,(0,0,255),2)
                 gridCounter += 1
 
 def connect_mqtt():
@@ -214,9 +220,9 @@ def linkRobotIdToRobot(robotID):
 
 def processVideo():
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
-    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
+    # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     # cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
-    # cap = cv.VideoCapture(1)      # External cam
+    cap = cv.VideoCapture(0)      # External cam
     firstFrame = True
 
     client = connect_mqtt()
@@ -281,7 +287,7 @@ def processVideo():
         cv.imshow("output", processedImg)
 
         # Press 'escape' to quit
-        k = cv.waitKey(0) & 0xff
+        k = cv.waitKey(1) & 0xff
         if k == 27 : break
 
 
