@@ -38,7 +38,7 @@ password = 'robots'
 
 class Robot:
     def __init__(self, redPos, greenPos):
-        self.robotID = None
+        self.robotID = "robot0" # None
         self.redPos = redPos
         self.greenPos = greenPos
         self.gridPos = 0
@@ -277,6 +277,7 @@ def processVideo():
                         robot.gridPos = newGridPos
                         robot.sendPosition(client)
                     robot.drawSelf(processedImg)
+                    
 
                     if robot.heading != robot.prevHeading:
                         robot.sendHeading(client)
