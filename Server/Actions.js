@@ -237,8 +237,9 @@ function begin(robot){
 
 function linkToCamera(){
     robotLib.robots.forEach(function(robot) {
-        topic = "robots/toCamera/" + robot + "/link"
-        communication.publishMessage(topic, "")
+        topic = "robots/toCamera/" + robot + "/link";
+        //communication.publishMessage(topic, "");
+        
     });
 }
 
