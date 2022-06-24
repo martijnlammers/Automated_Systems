@@ -5,7 +5,7 @@ const int aruinoAdress = 8;
 const int ldrPin = A0;
 const int irPin = 2;
 //const int irPin2 = 3;
-byte ldrValue = 0;
+int ldrValue = 0;
 int ldrValueAVG = 0;
 int ldrValueCNT = 0;
 byte irValueDown = 0;
@@ -22,11 +22,15 @@ void setup()
 void loop()
 {
   ldrValue = analogRead(ldrPin);
+  Serial.print(" ");
+  Serial.print(ldrValue);
   irValueDown = !digitalRead(irPin);
 //  irValueFront = !digitalRead(irPin2);
   if(ldrValue > 4)
   {
     ldrValueAVG += ldrValue;
+//    Serial.print(" ");
+//    Serial.print(ldrValueAVG);
     ldrValueCNT++;
   }
   delay(20);
@@ -34,16 +38,16 @@ void loop()
 
 void requestEvent()
 {
-  byte ldrSendValue = ldrValueAVG / ldrValueCNT;
+  int ldrSendValue = ldrValueAVG / ldrValueCNT;
   
   Wire.write(ldrSendValue);
   Wire.write(irValueDown);
 //  Wire.write(irValueFront);
-  Serial.print("ldr:");
+  Serial.print("\n ldr:");
   Serial.print(ldrSendValue);
   Serial.print("\t");
   Serial.print("irDown:");
-  Serial.print(irValueDown*100);
+  Serial.println(irValueDown*100);
 //  Serial.print("\t");
 //  Serial.print("irFront:");
 //  Serial.println(irValueFront*100);
