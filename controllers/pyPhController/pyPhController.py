@@ -11,16 +11,15 @@
 from controller import Robot, Motor, GPS, LightSensor, DistanceSensor, InertialUnit, Supervisor
 import math as m
 import paho.mqtt.client as mqtt
-import uuid
+import uuid, time
 
 # Constants
 
 HOST, PORT = "145.24.222.37", 8005
 USERNAME, PASSWORD = "robots", "robots"
 
-TIME_STEP = 20
+TIME_STEP = 8
 ROTATE_SPEED, MAX_SPEED = 1, 4
-POS_CORRECTION = 3
 POS_MATCHING_ACC = 0.03
 ANGLE_ACCURACY = 1
 
@@ -36,7 +35,7 @@ sensor_ground, sensor_inert = r.getDevice("ground_ds"), r.getDevice("inertial un
 
 client = mqtt.Client()
 robotId, uuid = None, uuid.uuid4().hex
-action_index = 2
+action_index = 3
 state = "NO_TASK"
 destination = None
 found_target = False
@@ -55,17 +54,14 @@ def setupRobot():
     motorStop()
 
 # Basic movement for the robot.
-
-
 def motorStop():
     motor_left.setVelocity(0)
     motor_right.setVelocity(0)
     r.step(TIME_STEP)
-
-
-def motorMoveForward():
-    motor_left.setVelocity(MAX_SPEED)
-    motor_right.setVelocity(MAX_SPEED)
+    
+def motorMoveForward(speed):
+    motor_left.setVelocity(speed)
+    motor_right.setVelocity(speed)
     r.step(TIME_STEP)
 
 
@@ -113,7 +109,7 @@ def getHeading():
     r.step(TIME_STEP)
     deg = sensor_inert.getRollPitchYaw()[2] * 57.2957795
     deg = abs(deg) if (deg < 0) else 360 - deg
-
+    
     # The algorithm on the server can only use
     # 0, 90, 180 and 270 to do it's calculations with.
 
@@ -130,93 +126,34 @@ def getHeading():
     return headingDictionary.get(1)
 
 
-def rotateToTarget(destination):
+def rotateHeading(heading_new):
+    direction = None
+    motorMoveForward(0)
     
-    # This block is used to determine to rotate
-    # clockwise or counter clockwise.
+    diff = getHeading() - heading_new
+    directionDict = {(diff == 90 or diff == -270): motorRotateLeft, 
+                    (diff == 180 or diff == -180): motorRotateRight,
+                    (diff == -90 or diff == 270): motorRotateRight, 
+                    (diff == 0): motorStop}
     
-    initialAngle = calculateAngleToTarget(getVectors(destination))
-    motorRotateLeft()
     r.step(TIME_STEP)
-    motorStop()
-    
-    # Rotate wheels until the angle is close
-    # to 0 deg.
-
-    if(initialAngle > calculateAngleToTarget(getVectors(destination))):
-        motorRotateLeft() 
-    else:
-        motorRotateRight()
-    while(calculateAngleToTarget(getVectors(destination)) > ANGLE_ACCURACY):
-        r.step(TIME_STEP)
-    motorStop()
-    return
-
-
-def moveToTarget(destination):
-    global path, found_target, on_target_pos
-    obstacle = False
-    
-    # The condition variable is used to
-    # constructs a do-while loop, which
-    # don't exist in Python.
-    
-    condition = True
-    motorMoveForward()
-    while(condition and not found_target and not obstacle):
-        vectors = getVectors(destination)
-        lengthToDestination = abs(m.sqrt(m.pow(vectors[0][0], 2) + m.pow(vectors[0][1], 2)))
-        found_target = True if (sensor_light.getValue() > 450) else False
-        obstacle = True if (sensor_ground.getValue() == 1000 or sensor_dist.getValue() < 400) else False
-        condition = (lengthToDestination > POS_MATCHING_ACC)
-        r.step(TIME_STEP)
-    if(not found_target and not obstacle):
-        for i in range(POS_CORRECTION):
-            r.step(1)
-    motorStop()
-    
-    # Sends location and heading to broker 
-    # once completed with task.
-    
-    publish("robots/toServer/" + robotId + "/position", str(translateToNodeNumber(gps_mid.getValues())))
-    publish("robots/toServer/" + robotId + "/heading", getHeading())
-    publish("robots/toServer/" + robotId + "/state", "NO_TASK")
-   
-    if(found_target):
-        path = []
-        publish(f"robots/toServer/{robotId}/goalDetected", "true")
+    while(getHeading() != heading_new):
+        directionDict.get(1)()
         
-    elif(obstacle):                                            # v Where the obstacle is found.
-        path = []                                              # v [North, East, South, West]         
-        publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
-  
-def moveRobot(node_number):
-    global path, destination
-    destination = translateToCoordinates(node_number)
-    m_robotPos = gps_mid.getValues()
-    print(destination)
-    # Quits function when the destination equals the current position.
-
-    if (m.fabs(m_robotPos[0] - destination[0]) < POS_MATCHING_ACC and
-            m.fabs(m_robotPos[1] - destination[1]) < POS_MATCHING_ACC):
-        return
-    vectors = getVectors(destination)
-
-    # Move robot to (x,y)
-    rotateToTarget(destination)
-    moveToTarget(destination)
-    
-    
+    time.sleep(1.7)
+    motorStop()
+    print("done")
+    return
 
 
 # Position translators will turn x,y coordinates in corresponding node number
 # and visa versa for server-robot interactions..
 def translateToCoordinates(node_nr):
-    return [((int(node_nr / 12)) * 0.2) - 0.0906478, ((node_nr % 12) * 0.2) + 0.0102571]
+    return [((int(node_nr / 6)) * 0.2) - 0.0906478, ((node_nr % 6) * 0.2) + 0.0102571]
 
 
 def translateToNodeNumber(pos):   
-    return((m.ceil((round(pos[0]  + 0.1084682, 1)) / 0.2) * 12) + 
+    return((m.ceil((round(pos[0]  + 0.1084682, 1)) / 0.2) * 6) + 
                 (m.ceil((round(pos[1] + 0.002948, 1)) / 0.2)))
 
 
@@ -224,67 +161,73 @@ def translateToNodeNumber(pos):
 def publish(topic, message):
     global robotId, client
     client.publish(topic, message, qos=2)
-    print(str(robotId) + " publishing to: " +
-          str(topic) + " message: " + str(message))
-
+    # print(str(robotId) + " publishing to: " +
+          # str(topic) + " message: " + str(message))
+def updateRobotData():
+    publish("robots/toServer/" + robotId + "/position", str(translateToNodeNumber(gps_mid.getValues())))
+    publish("robots/toServer/" + robotId + "/heading", getHeading())
+    publish("robots/toServer/" + robotId + "/state", "NO_TASK")
 
 def on_connect(client, userdata, flags, rc):
     print("Robot connected successfully, response code: " + str(rc))
-
 
 def on_message(client, userdata, msg):
     global action_index, robotId, path, uuid, found_target
     action = str(msg.topic).split("/")[action_index]
     payload = str(msg.payload.decode("utf-8"))
-    print(action + " " + payload + " " + uuid)
+    # print(action + " " + payload + " " + uuid)
 
-    if(action.__eq__("path")):
-        path = []   
-        next_positions = payload.split(',')
-        for i in range(len(next_positions)):
-            path.append(int(next_positions[i]))
-    elif(action.__eq__("register")):
-        robotId = payload
-        client.subscribe(f"robots/toRobot/{robotId}/#")
-        topics = ["/state", "/model", "/heading", "/position", "/begin"]
-        messages = ["NO_TASK", "VIRTUAL", getHeading(
-        ), str(translateToNodeNumber(gps_mid.getValues())), ""]
-        for i in range(len(topics)):
-            publish(
-                f"robots/toServer/{robotId}{topics[i]}", messages[i])
-
-        # The MQTT format changes after registration
-        # so the topic index also has to change.
-
-        action_index = 3
-    elif(action.__eq__("stop")):
-        motorStop()
-        path = []
-    elif(action.__eq__("goalDetected")):
-        target_found = True
-    elif(action.__eq__("end")):
-        path = []
-        client.unsubscribe(f"robots/toRobot/register/{uuid}")
-        client.unsubscribe(f"robots/toRobot/{robotId}/#")
+    if(action.__eq__("heading")):
+        rotateHeading(payload)
+    elif(action.__eq__("drive")):
+        motorMoveForward(speed)
     return
 
 
 def setupMQTT():
-    client.on_connect = on_connect
-    client.on_message = on_message
-    client.username_pw_set(USERNAME, PASSWORD)
-    client.connect(HOST, PORT, 5)
-    client.subscribe("robots/toRobot/register/" + uuid)
-    client.publish("robots/toServer/register/" + uuid, "")
+    c = client
+    c.on_connect, c.on_message = on_connect, on_message
+    c.username_pw_set(USERNAME, PASSWORD)
+    c.connect(HOST, PORT, 5)
+    c.subscribe("robots/toRobot/robot0/drive")
+    c.subscribe("robots/toServer/robot0/heading")
 
 if __name__ == "__main__":
     setupRobot()
     setupMQTT()
     while(r.step(TIME_STEP) != -1):
         client.loop()
-        if(len(path) > 0):
-            dest = path.pop(0)
-            moveRobot(dest)
-        r.step(TIME_STEP)
-    # print(translateToNodeNumber(gps_mid.getValues()))
-    # moveRobot(0)
+        if(sensor_dist.getValue() < 600):
+            motorStop()
+            publish(f"robots/toServer/{robotId}/robotDetected", "1,0,0,0")     
+            time.sleep(0.5)
+        if(sensor_ground.getValue() == 1000):
+            motorStop()
+            publish(f"robots/toServer/{robotId}/obstacleDetected", "1,0,0,0")
+        if(sensor_light.getValue() > 400):
+            motorStop()
+            publish(f"robots/toServer/{robotId}/goalDetected", "true")
+            
+    
+  
+    
+        
+""" 
+1. 
+
+robotDetected = false
+robotDetectedSend = false
+loop:
+    if(robotDetected && robotDetectedSend == false):
+        client.publish("robots/toServer/" +robotId+ "/robotDetected", "1,0,0,0")
+        robotDetectedSend = true
+        motorStop()  
+    
+    ReadIR()
+    
+subscribe toRobot/ID/drive => drive()
+subscribe toServer/ID/heading => changeHeading()
+ReadIR():
+    if(IR):
+        robotDetected = true
+"""
