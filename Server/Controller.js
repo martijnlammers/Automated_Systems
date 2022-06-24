@@ -1,8 +1,8 @@
 var munkres = require('munkres-js');
 var robotLib = require("./Robot");
 
-const rows = 10;
-const columns = 10;
+const rows = 12;
+const columns = 6;
 
 function createFirstTargetSet() {
     var firstTargetSet = [];
@@ -24,11 +24,10 @@ function createFirstTargetSet() {
 
 function createTargetSets(numberOfTargetSets) {
     targetSetMatrix = makeEmpty2DArray(numberOfTargetSets)
-    var targetSetPattern = [rows-1, robotLib.robotCounter * rows, -(rows - 1), robotLib.robotCounter * rows];
+    var targetSetPattern = [columns-1, robotLib.robotCounter * columns, -(columns - 1), robotLib.robotCounter * columns];
     var firstTargetSet = createFirstTargetSet();
     var targetSetMatrix = makeEmpty2DArray(numberOfTargetSets);
     var target;
-
     for (let firstTargetSetIndex = 0; firstTargetSetIndex < firstTargetSet.length; firstTargetSetIndex++) {
         target = firstTargetSet[firstTargetSetIndex];
         targetSetMatrix[0].push(target);
@@ -39,6 +38,7 @@ function createTargetSets(numberOfTargetSets) {
         }
     }
 
+    console.log("targetSetMatrix", targetSetMatrix);
     return targetSetMatrix;
 }; 
 
@@ -117,14 +117,11 @@ function makeEmpty2DArray(numberOfRows) {
     return array;
 };
 
-function breadthFirstSearch(adjacencyMatrix, robotPositions, startVertex, numberOfVertices) {
+function breadthFirstSearch(adjacencyMatrix, startVertex, numberOfVertices) {
     var previous = makeEmpty2DArray(numberOfVertices);
     var visited = new Array(numberOfVertices).fill(false);
     var queue = [startVertex];
     visited[startVertex] = true;
-    robotPositions.forEach((robotPosition) => {
-        visited[robotPosition] = true;
-    });
 
     while (queue.length > 0) {
         var visiting = queue[0];
@@ -142,55 +139,39 @@ function breadthFirstSearch(adjacencyMatrix, robotPositions, startVertex, number
 };
 
 function traceRoute(previous, startVertex, targetVertex) {
-    // console.log("traceRoute begin");
-    // console.log("startVertex", startVertex);
-    // console.log("endVertex", targetVertex);
-    // console.log("previous", previous);
     var path = [targetVertex];
     if (startVertex == targetVertex) return path;
 
     var previousStep = previous[targetVertex][0];
     while (previousStep != startVertex) {
         path.push(previousStep);
-        // console.log(previousStep);
         previousStep = previous[previousStep][0];
     }
-    // console.log("traceRoute end");
     return path.reverse();
 };
 
 function getPathAndAssignment (adjacencyMatrix, numberOfVertices, startVertexVector, targetSet) {
-//   console.log("pathAndAssignment begin");
-//   console.log(targetSet);
   var startVertex, targetVertex;
   var numberOfTargets = targetSet.length;
   var costMatrix = makeEmpty2DArray(robotLib.robotCounter);
   var shortestPathStartToTarget;
   var shortestPathMatrix = [];
-
   for (let robotIndex = 0; robotIndex < robotLib.robotCounter; robotIndex++) {
     shortestPathMatrix.push([]);
     for (let targetIndex = 0; targetIndex < numberOfTargets; targetIndex++) {
       startVertex = startVertexVector[robotIndex];
       targetVertex = targetSet[targetIndex];
-    //   console.log("indices (robot) (target)",robotIndex, targetIndex);
-    //   console.log("startVertexVector",startVertexVector);
-    //   console.log("startVertex",startVertex);
       if (startVertexVector.includes(targetVertex) && targetVertex !== startVertex) {
         shortestPathMatrix[robotIndex].push([]);
         costMatrix[robotIndex][targetIndex] = Number.POSITIVE_INFINITY;
         continue;
       } 
-      let previous = breadthFirstSearch(adjacencyMatrix, startVertexVector, startVertex, numberOfVertices);
-    //   console.log(previous);
+      let previous = breadthFirstSearch(adjacencyMatrix, startVertex, numberOfVertices);
       shortestPathStartToTarget = traceRoute(previous, startVertex, targetVertex);
       shortestPathMatrix[robotIndex].push(shortestPathStartToTarget);
       costMatrix[robotIndex][targetIndex] = shortestPathStartToTarget.length;
     }
   }
-//   console.log("shortestPaths", shortestPathMatrix);
-//   console.log("costMatrix", costMatrix);
-//   console.log("pathAndAssignment end");
   return [shortestPathMatrix, costMatrix];
 };
 
