@@ -117,13 +117,13 @@ def publishMQTT(client, topic, msg):
 def subscribeMQTT(client):
     def on_message(client, userdata, msg):
         text = msg.payload.decode()
-        robotID = msg.topic # pick robotID from topic
+        splitTopics = msg.topic.split("/")
         print(f"Received `{text}` from `{msg.topic}` topic")
-        robot = getRobot(robotID)
-        robot.sendHeading(client)
 
-    client.subscribe(f"robots/toServer/+/rotateAck")
+    r, _ = client.subscribe([("(robots/toServer/+/rotateAck", 0), ("robots/toCamera/+/link", 0)])
+    
     client.on_message = on_message
+    return r
 
 def getRobot(searchId):
     for robot in robots:
@@ -218,15 +218,13 @@ def linkRobotIdToRobot(robotID):
                 if abs(deltaTheta) > 3:
                     robot.robotID = robotID
 
-def processVideo():
+def processVideo(client):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     # cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
     cap = cv.VideoCapture(0)      # External cam
     firstFrame = True
 
-    client = connect_mqtt()
-    subscribeMQTT(client)
     while(1):
         client.loop_start()
 
@@ -275,14 +273,12 @@ def processVideo():
                     newGridPos = grid.positionOnGrid(robot.center[0], robot.center[1])
                     if(newGridPos != robot.gridPos):
                         robot.gridPos = newGridPos
-                        robot.sendPosition(client)
+                        if robot.robotID is not None:
+                            robot.sendPosition(client)
                     robot.drawSelf(processedImg)
-                    
 
-                    if robot.heading != robot.prevHeading:
+                    if robot.heading != robot.prevHeading and robot.robotID is not None:
                         robot.sendHeading(client)
-                    
-                    
         
         cv.imshow("frame", frame)
         cv.imshow("output", processedImg)
@@ -291,13 +287,14 @@ def processVideo():
         k = cv.waitKey(1) & 0xff
         if k == 27 : break
 
-
     cap.release()
     processedImg.release()
     cv.destroyAllWindows()
 
 def main():
-    processVideo()
+    client = connect_mqtt()
+    subscribeMQTT(client)
+    processVideo(client)
 
 if __name__ == "__main__":
     main()
