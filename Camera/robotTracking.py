@@ -252,9 +252,9 @@ def timeHasPassed(prevTime, time_s):
 
 def processVideo(client):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
-    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
+    # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     # cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
-    # cap = cv.VideoCapture(0)      # External cam
+    cap = cv.VideoCapture(0)      # External cam
     firstFrame = True
 
     while(1):
