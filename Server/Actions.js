@@ -4,7 +4,7 @@ const algorithms = require("./Controller");
 const munkres = require("munkres-js");
 
 const ANGLE_MARGIN = 3;
-const MOTOR_SPEED = 90;
+const MOTOR_SPEED = 60;
 var visitedLocations = new Array(100).fill(false);
 
 // CHECK VARIABLE AND FUNCTION NAMES
@@ -89,11 +89,11 @@ function removeObstaclesFromAdjacencyMatrix(adjacencyMatrix, obstaclePosition) {
     }
 }
 
-function getUpdatedAdjacencyMatrix(obstacleLocation, robotPositions) {
-    // var adjacencyMatrixCopy = JSON.parse(JSON.stringify(algorithms.adjacencyMatrix));
+function getUpdatedAdjacencyMatrix(obstacleLocations, robotPositions) {
+    // let adjacencyMatrixCopy = JSON.parse(JSON.stringify(algorithms.adjacencyMatrix));
     
-    for (obstacleIndex in obstacleLocation) { 
-        let obstaclePosition = obstacleLocation[obstacleIndex]; 
+    for (obstacleIndex in obstacleLocations) { 
+        let obstaclePosition = obstacleLocations[obstacleIndex]; 
         // console.log("obstaclePosition", obstaclePosition);
         if (robotPositions.includes(obstaclePosition)) continue
         else removeObstaclesFromAdjacencyMatrix(algorithms.adjacencyMatrix, obstaclePosition);
@@ -102,49 +102,47 @@ function getUpdatedAdjacencyMatrix(obstacleLocation, robotPositions) {
     return algorithms.adjacencyMatrix;
 }
 
-function getTargetSet() {
-    if (robotLib.targetSetIndex !== algorithms.targetSetMatrix.length) {
-        // console.log("MATRIX");
-        return algorithms.targetSetMatrix[robotLib.targetSetIndex];
-    } else {
-        // console.log("UNVISITED");
-        let targetSet = [];
-        let targetCounter = 0;
-        while(targetCounter < robotLib.NUM_OF_ROBOTS) {
-            let unvisitedLocation = visitedLocations.findIndex(location => location == false);
-            if (unvisitedLocation == -1) return false;
-            visitedLocations[unvisitedLocation] = true;
-            targetSet.push(unvisitedLocation);
-            targetCounter++;
-        }
-        return targetSet;
+function robotDetected(robot) {
+    console.log(`${robot.robotID} has run into a robot!`);
+    communication.publishMessage(`robots/toRobot/${robot.robotID}/stop`, "");
+    target = robot.path.pop();
+    console.log(robot.robotID, target, robot.position);
+    let adjacencyMatrixCopy = JSON.parse(JSON.stringify(algorithms.adjacencyMatrix));
+    detectedRobots = getObstacleLocations(robot.position, robot.heading, robot.obstacleDetected);
+    console.log(detectedRobots);
+    detectedRobots.forEach((detectedRobot) => {
+        removeObstaclesFromAdjacencyMatrix(adjacencyMatrixCopy, detectedRobot);
+    });
+    // 6. Hij herberekent het pad
+    previous = algorithms.breadthFirstSearch(adjacencyMatrixCopy, robot.position, algorithms.rows * algorithms.columns);
+    path = algorithms.traceRoute(previous, robot.position, target);
+    // 7. Geeft pad aan de robot
+    robot.path = path;
+    robot.pathIndex = 1;
+
+    if(robot.model === "VIRTUAL"){
+        communication.publishMessage(`robots/toRobot/${robot.robotID}/path`, `${robot.path}`);
     }
+
 }
 
 function obstacleDetected(robot) {
-    // console.log("obstacleDetected", robot.robotID);
-    robotLib.robots.forEach((currentRobot) => {
-        // console.log("ObstacleDetected", currentRobot.robotID);
-        if(currentRobot.model === "PHYSICAL") {
-            communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/drive`, 0);
-        } else {
-            communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/stop`, "");
-        }
+    communication.publishMessage(`robots/toRobot/${robot.robotID}/stop`, "");
+    target = robot.path.pop();
+    detectedObstacles = getObstacleLocations(robot.position, robot.heading, robot.obstacleDetected);
+    console.log(detectedObstacles);
+    detectedObstacles.forEach((detectedObstacle) => {
+        removeObstaclesFromAdjacencyMatrix(algorithms.adjacencyMatrix, detectedObstacle);
+        visitedLocations[detectedObstacle] = true;
     });
-    // console.log("=================================");
-    // console.log(robotLib.targetSetIndex);
-    let obstacleLocations = getObstacleLocations(robot.position, robot.heading, robot.obstacleDetected);
-    let robotPositions = getRobotPositions();
-    obstacleLocations.forEach((location) => {visitedLocations[location] = true;});
-    robotPositions.forEach((location) => {visitedLocations[location] = true;});
-    // console.log("obstacleLocations:", obstacleLocations);
+    previous = algorithms.breadthFirstSearch(algorithms.adjacencyMatrix, robot.position, algorithms.rows * algorithms.columns);
+    path = algorithms.traceRoute(previous, robot.position, target);
+    robot.path = path;
+    robot.pathIndex = 1;
 
-    let updatedAdjacencyMatrix = getUpdatedAdjacencyMatrix(obstacleLocations, robotPositions);
-    let targetSet = getTargetSet();
-    if (!targetSet) return;
-    updatePaths(updatedAdjacencyMatrix, targetSet);
-
-    sendPathOrInstructionToRobot();
+    if(robot.model === "VIRTUAL"){
+        communication.publishMessage(`robots/toRobot/${robot.robotID}/path`, `${robot.path}`);
+    }
 }
 
 function getGoalLocation(robotLocation, heading) {
@@ -155,10 +153,7 @@ function getGoalLocation(robotLocation, heading) {
 }
 
 function goalDetected(robot) {
-    console.log("goalDetected", robot.robotID);
     robotLib.robots.forEach((currentRobot) => {
-        console.log("robotID", currentRobot.robotID);
-        console.log("position", currentRobot.position);
         currentRobot.goalDetected = true;
         if(currentRobot.model === "PHYSICAL") {
             communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/drive`, 0);
@@ -169,35 +164,23 @@ function goalDetected(robot) {
     });
 
     let goalLocation = getGoalLocation(robot.position, robot.heading);
-    console.log("goalLocation", goalLocation);
-    let locationLeftOfGoal = goalLocation - 1;
-    let locationRightOfGoal = goalLocation + 1;
-    let locationAboveGoal = goalLocation - algorithms.columns;
-    let locationBelowGoal = goalLocation + algorithms.columns;
-    let targetSet = [locationLeftOfGoal, locationRightOfGoal, locationAboveGoal, locationBelowGoal];
-    // let targetSet = [locationBelowGoal, locationLeftOfGoal];
-
-    removeObstaclesFromAdjacencyMatrix(algorithms.adjacencyMatrix, goalLocation);
-    updatePaths(algorithms.adjacencyMatrix, targetSet);
-    sendPathOrInstructionToRobot();
-
+    console.log(`SIMULATION COMPLETED\nGoal found at node number: ${goalLocation}`);
 }
 
 function registerRobot(topicArray) {
     if(robotLib.robotCounter >= robotLib.NUM_OF_ROBOTS) return;
     newRobot = robotLib.addRobot(`robot${robotLib.robotCounter++}`);
     topicArray[1] = "toRobot";
-    console.log(topicArray);
     communication.publishMessage(topicArray.join("/"), newRobot.robotID);
     console.log(`Published id: ${newRobot.robotID}`);
 }
 
 function calulateHeadingBetweenVertices(currentPosition, destination) {
-    if (currentPosition - columns == destination) {
+    if (currentPosition - algorithms.columns == destination) {
         return 0;
     } else if (currentPosition + 1 == destination) {     
         return 90;
-    } else if (currentPosition + columns == destination) {
+    } else if (currentPosition + algorithms.columns == destination) {
         return 180; 
     } else if (currentPosition - 1 == destination) {
         return 270;
@@ -205,23 +188,25 @@ function calulateHeadingBetweenVertices(currentPosition, destination) {
 }
 
 function rotateOrDrive(robot) { 
-    let destination = robot.path[robot.pathIndex + 1];
+    let destination = robot.path[robot.pathIndex];
     let correctHeading = calulateHeadingBetweenVertices(robot.position, destination);
-
     let correctionAngle = correctHeading > robot.heading ? correctHeading - robot.heading : 360 - (robot.heading - correctHeading);
+    console.log(correctionAngle, robot.heading)
     if (correctionAngle > ANGLE_MARGIN && correctionAngle < (360 - ANGLE_MARGIN)) {
-        communication.publishMessage(`robots/toRobot/${robot.robotID}/rotateDegrees`, correctionAngle);
+        communication.publishMessage(`robots/toRobot/${robot.robotID}/rotateDegrees`, `${correctionAngle}`);
     } else {
-        communication.publishMessage(`robots/toRobot/${robot.robotID}/drive`, MOTOR_SPEED);
+        communication.publishMessage(`robots/toRobot/${robot.robotID}/drive`, `${MOTOR_SPEED}`);
     }
 }
 
 function sendPathOrInstructionToRobot() {
     robotLib.robots.forEach((currentRobot) => {
-        // console.log("path:", currentRobot.path);
-
-        if(currentRobot.model === "VIRTUAL") communication.publishMessage(`robots/toRobot/${currentRobot.robotID}/path`, `${currentRobot.path}`);
-        // else rotateOrDrive(currentRobot);
+        console.log(currentRobot);
+        if(currentRobot.model === "VIRTUAL") communication.publishMessage(
+            `robots/toRobot/${currentRobot.robotID}/path`, `${currentRobot.path}`);
+        else {
+            rotateOrDrive(currentRobot);
+        }
     });
 }
 
@@ -232,71 +217,78 @@ function begin(robot){
         begin_flag = true;
     }
     if(!begin_flag) return;
-    // communication.publishMessage(`robots/toRobot/${robot.robotID}/setPos`, `${0}`);
-    // communication.publishMessage(`robots/toRobot/${robot.robotID}/rotateDegrees`, `${270}`);
+
+    //Link all robots with the camera
+    linkToCamera()
+
     let numberOfTargetSets = Math.round((algorithms.rows / robotLib.robotCounter) * 2);
     algorithms.targetSetMatrix = algorithms.createTargetSets(numberOfTargetSets);
     let startVertexVector = getRobotPositions();
     let numberOfVertices = algorithms.rows * algorithms.columns;
     let pathAndAssignment = algorithms.getPathAndAssignment(algorithms.adjacencyMatrix, numberOfVertices, startVertexVector, algorithms.targetSetMatrix[robotLib.targetSetIndex]);
     let optimalAssignments = munkres(pathAndAssignment[1]);
-
     for (assignmentIndex in optimalAssignments) {
         currentOptimalAssingment = optimalAssignments[assignmentIndex];
         robotLib.robots[assignmentIndex].path = pathAndAssignment[0][currentOptimalAssingment[0]][currentOptimalAssingment[1]];
-        // console.log(robotLib.robots[assignmentIndex].path);
     }
-    // console.log(3);
+    // if(robot.position == 32) return; // TESTT
     sendPathOrInstructionToRobot();
 }
 
+function linkToCamera(){
+    robotLib.robots.forEach(function(robot) {
+        topic = "robots/toCamera/" + robot + "/link"
+        communication.publishMessage(topic, "")
+    });
+}
+
 function position(robot) {
-    console.log("position", robot.robotID);
-    console.log(robot.path);
-
-    visitedLocations[robot.position] = true;
-
-    // console.log(robot.path.length, robot.pathIndex);
-    if (robot.pathIndex === robot.path.length && robot.path.length > 0) {
+    //visitedLocations[robot.position] = true;
+    console.log(robot)
+    if (robot.pathIndex === robot.path.length && robot.path.length > 0 && robot.state !== "WAITING") {
         if (robot.goalDetected) {
             communication.publishMessage(`robots/toRobot/${robot.robotID}/end`, "")
-            console.log("robotID done", robot.robotID);
             return;
         }
+
         robotLib.readyForNextTarget++;
-        console.log("readyForNextTarget", robotLib.readyForNextTarget);
+        robot.state = "WAITING"
         if (robotLib.readyForNextTarget === robotLib.NUM_OF_ROBOTS) {
             robotLib.readyForNextTarget = 0;
-            if (robotLib.targetSetIndex !== algorithms.targetSetMatrix.length) robotLib.targetSetIndex++;
+            let targetSet;
+            if (robotLib.targetSetIndex !== algorithms.targetSetMatrix.length) {
+                robotLib.targetSetIndex++;
+                targetSet = algorithms.targetSetMatrix[robotLib.targetSetIndex];
+            } else {
+                return;
+            }
 
-            let targetSet = getTargetSet();
-            if (!targetSet) return;
             updatePaths(algorithms.adjacencyMatrix, targetSet);
-            
             sendPathOrInstructionToRobot();
+            robotLib.robots.forEach((robot) => {
+                robot.state = "NO_TASK";
+            });
         }
-        
+        // console.log(visitedLocations);
         return;
     }
     // TO DO CHECK PARAMETER (IS THE TOPIC THE SAME)
     if (robot.model === "VIRTUAL") {
-        // console.log("test1");
         robot.pathIndex++;
         return;
     }
 
     if (robot.position === robot.path[robot.pathIndex + 1] ) {
-        // console.log("test2");
         robot.pathIndex++;
-        communication.publishMessage(`robots/toRobot/${robot.robotID}/drive`, 0);   //test if necessery
+        communication.publishMessage(`robots/toRobot/${robot.robotID}/drive`, "0");   //test if necessery
 
-        sendInstructionToRobot();
+        rotateOrDrive(robot);
     }
 
-    //bot drove wrong
+    //bot drove wrong or not all bots begin
     
 }
 
-module.exports = {getVerticesAroundLocation, shiftArray, getObstacleLocations, getRobotPositions, updatePaths, 
+module.exports = {robotDetected, getVerticesAroundLocation, shiftArray, getObstacleLocations, getRobotPositions, updatePaths, 
   removeObstaclesFromAdjacencyMatrix, getUpdatedAdjacencyMatrix, obstacleDetected, getGoalLocation, goalDetected, 
   registerRobot, rotateOrDrive, begin, position};
