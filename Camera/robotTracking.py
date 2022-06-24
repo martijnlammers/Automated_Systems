@@ -232,7 +232,7 @@ def linkRobotIdToRobot(robotID):
     if not timeHasPassed(prevTime, 10):
         for robot in robots:
             if robot.robotID is None:
-                deltaTheta = min(robot.heading - (robot.prevHeading), 360 - (robot.heading - (robot.prevHeading)))
+                deltaTheta = min(abs(robot.heading - (robot.prevHeading)), 360 - abs((robot.heading - (robot.prevHeading))))
                 if abs(deltaTheta) >= 5:
                     robot.robotID = robotID
                     global robotToLink
