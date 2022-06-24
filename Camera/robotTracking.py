@@ -1,3 +1,4 @@
+from time import time
 import cv2 as cv
 import numpy as np
 import math
@@ -20,6 +21,8 @@ MAX_DISTANCE = 150 #change if camera distance is increased/decreased
 RESOLUTION = (1280, 720)
 
 robotsStopped = True
+robotToLink = None
+setPrevTime = True
 
 robots = []
 coordDict = {60:0,48:1,36:2,24:3,12:4,0:5,61:6,49:7,37:8,25:9,13:10,1:11,62:12,
@@ -32,13 +35,13 @@ coordDict = {60:0,48:1,36:2,24:3,12:4,0:5,61:6,49:7,37:8,25:9,13:10,1:11,62:12,
 
 broker = '145.24.222.37'
 port = 8005
-client_id = 'TrackingClient1'
+client_id = None
 username = 'robots'
 password = 'robots'
 
 class Robot:
     def __init__(self, redPos, greenPos):
-        self.robotID = "robot0" # None
+        self.robotID = None
         self.redPos = redPos
         self.greenPos = greenPos
         self.gridPos = 0
@@ -50,6 +53,9 @@ class Robot:
     def drawSelf(self, imgOut):
         cv.circle(imgOut, self.center, 5, (0, 255, 255), cv.FILLED)
         cv.line(imgOut, self.greenPos, self.redPos, (0, 255, 255), 2)
+
+        if self.robotID is not None:
+            cv.putText(imgOut, self.robotID, (self.center[0],self.center[1]+20), cv.FONT_HERSHEY_PLAIN, 1.25, (255,255,0), 2)
     
     def findHeading(self):
         self.prevHeading = self.heading
@@ -98,6 +104,7 @@ def connect_mqtt():
             print("Connected to MQTT")
         else:
             print("Failed to connect to MQTT")
+    
     #Set Connecting Client ID
     client = mqtt.Client(client_id)
     client.username_pw_set(username, password)
@@ -119,6 +126,11 @@ def subscribeMQTT(client):
         text = msg.payload.decode()
         splitTopics = msg.topic.split("/")
         print(f"Received `{text}` from `{msg.topic}` topic")
+        
+        if splitTopics[3] == "link":
+            robotID = msg.topic.split("/")[2] # pick robotID from topic
+            global robotToLink
+            robotToLink = robotID
 
     r, _ = client.subscribe([("(robots/toServer/+/rotateAck", 0), ("robots/toCamera/+/link", 0)])
     
@@ -211,18 +223,38 @@ def getCenterOfTwoPoints(p1, p2):
     return cX, cY
 
 def linkRobotIdToRobot(robotID):
-    if robotsStopped:
+    global setPrevTime
+    global prevTime
+    if setPrevTime:
+        prevTime = time()
+        setPrevTime = False
+
+    if not timeHasPassed(prevTime, 10):
         for robot in robots:
-            if robot.robotID is not None:
+            if robot.robotID is None:
                 deltaTheta = min(robot.heading - (robot.prevHeading), 360 - (robot.heading - (robot.prevHeading)))
-                if abs(deltaTheta) > 3:
+                if abs(deltaTheta) >= 5:
                     robot.robotID = robotID
+                    global robotToLink
+                    robotToLink = None
+                    setPrevTime = True
+                    print("Linked!")
+                    return
+
+def timeHasPassed(prevTime, time_s):
+    
+    currentTime = time()
+    if currentTime > prevTime + time_s:
+        prevTime = currentTime
+        return True
+    else:
+        return False
 
 def processVideo(client):
     # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\robotCarColor.mp4")
-    # cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
+    cap = cv.VideoCapture("C:\\Users\\rtsmo\\Downloads\\multipleRobotTest2.mp4")
     # cap = cv.VideoCapture("C:\\Users\\inti1\\Videos\\Captures\\multipleRobotTest2.mp4")
-    cap = cv.VideoCapture(0)      # External cam
+    # cap = cv.VideoCapture(0)      # External cam
     firstFrame = True
 
     while(1):
@@ -259,12 +291,16 @@ def processVideo(client):
             robotAmount = min(len(greenPositions), len(redPositions))
 
             # Initialize or update the robots with their positions
+            if robotToLink is not None:
+                linkRobotIdToRobot(robotToLink)
+
             if firstFrame:
                 firstFrame = False
                 initRobots(distancesAndPoints, robotAmount)
                 for robot in robots:
                     robot.drawSelf(processedImg)
                 grid.draw(processedImg)
+
             else:
                 grid.draw(processedImg)
                 for robot in robots:
