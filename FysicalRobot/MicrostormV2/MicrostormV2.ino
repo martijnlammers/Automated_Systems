@@ -36,8 +36,8 @@ int motorChannel2 = 1;
 int motorFreq = 5000;
 int motorRes = 8;
 
-int motorSpeedStnd = 60;
-int cornerDelay = 800; //SCH>600<1200  Th<900
+int motorSpeedStnd = 45;
+int cornerDelay = 800;
 float delayForOneDegree = cornerDelay / 90;
 String robotId;
 
@@ -128,19 +128,17 @@ void readI2C()
 
   while(Wire.available())
   {
-    byte ldrValue = Wire.read();
-    if(ldrValue > 250) goalDetected = true;
-    if(goalDetected && ldrValue < 250) goalDetected = false;
+    goalDetected = Wire.read();
 
     byte irValueDown = Wire.read();   // is 0 if obstacle
-//    byte irValueFront = Wire.read();  // is 1 if robot
+//    byte irValueFront = Wire.read();  // is 1 if robot detected
     if(!irValueDown) obstacleDetected = true;
 //    if(irValueFront) robotDetected = true;
     if(obstacleDetected && irValueDown) obstacleDetected = false;
 //    if(robotDetected && !irValueFront) robotDetected = false;
 
-    Serial.print("ldr:");
-    Serial.print(ldrValue);
+    Serial.print("goal:");
+    Serial.print(goalDetected);
     Serial.print("\t");
     Serial.print("irDown:");
     Serial.println(irValueDown);

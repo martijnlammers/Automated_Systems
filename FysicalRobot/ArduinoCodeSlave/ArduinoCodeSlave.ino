@@ -38,13 +38,18 @@ void loop()
 
 void requestEvent()
 {
+  bool goalDetected = false;
   int ldrSendValue = ldrValueAVG / ldrValueCNT;
+  if(ldrSendValue > 450) 
+  {
+    goalDetected = true;
+  }
   
-  Wire.write(ldrSendValue);
+  Wire.write(goalDetected);
   Wire.write(irValueDown);
 //  Wire.write(irValueFront);
-  Serial.print("\n ldr:");
-  Serial.print(ldrSendValue);
+  Serial.print("\n goal:");
+  Serial.print(goalDetected);
   Serial.print("\t");
   Serial.print("irDown:");
   Serial.println(irValueDown*100);
